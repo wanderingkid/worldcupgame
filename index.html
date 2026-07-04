@@ -24,60 +24,64 @@
     </div>
 
     <script>
-        const supabase = supabase.createClient('https://yvkbmelrvdfdjlbanciv.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2a2JtZWxydmRmZGpsYmFuY2l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxNjM1ODksImV4cCI6MjA5ODczOTU4OX0.BP6DzEGRInduT3bueKlJRoJNGP9I4Pwk7HKxiBGF4A0');
+    // 1. Initialize Supabase only ONCE
+    const supabase = supabase.createClient('https://yvkbmelrvdfdjlbanciv.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2a2JtZWxydmRmZGpsYmFuY2l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxNjM1ODksImV4cCI6MjA5ODczOTU4OX0.BP6DzEGRInduT3bueKlJRoJNGP9I4Pwk7HKxiBGF4A0');
 
-        async function load() {
-            const { data, error } = await supabase.from('matches').select('*');
-            if (error) { console.error(error); document.getElementById('bracket').innerText = "Error loading matches"; return; }
-            
-            document.getElementById('bracket').innerHTML = data.map(m => `
-                <div class="match-card">
-                    <small>${m.round_name}</small><br>
-                    <strong>${m.home_team} vs ${m.away_team}</strong><br>
-                    ${m.home_score !== null ? `<p>RESULT: ${m.home_score}-${m.away_score}</p>` : 
-                      `<input id="h_${m.id}" type="number" placeholder="H"> 
-                       <input id="a_${m.id}" type="number" placeholder="A">
-                       <button onclick="save(${m.id})">Predict</button>`}
-                </div>
-            `).join('');
+    async function load() {
+        const { data } = await supabase.from('matches').select('*');
+        if (!data) return;
+        document.getElementById('bracket').innerHTML = data.map(m => `
+            <div class="match-card">
+                <small>${m.round_name}</small><br>
+                <strong>${m.home_team} vs ${m.away_team}</strong><br>
+                ${m.home_score !== null ? `<p>RESULT: ${m.home_score}-${m.away_score}</p>` : 
+                  `<input id="h_${m.id}" type="number" placeholder="H"> 
+                   <input id="a_${m.id}" type="number" placeholder="A">
+                   <button onclick="save(${m.id})">Predict</button>`}
+            </div>
+        `).join('');
+    }
+
+    async function save(id) {
+        const name = prompt("Enter your name:");
+        if(!name) return;
+        const h = document.getElementById('h_'+id).value;
+        const a = document.getElementById('a_'+id).value;
+        await supabase.from('predictions').insert({ player_name: name, match_id: id, pred_home: h, pred_away: a });
+        alert("Prediction Saved!");
+        location.reload();
+    }
+
+    // Admin Functions
+    function unlockAdmin() {
+        if(prompt("Enter Password:") === "worldcup2026") {
+            document.getElementById('admin-panel').style.display = 'block';
+            loadAdmin();
+        } else {
+            alert("Wrong password!");
         }
+    }
 
-        async function save(id) {
-            const name = prompt("Enter your name:");
-            if(!name) return;
-            const h = document.getElementById('h_'+id).value;
-            const a = document.getElementById('a_'+id).value;
-            await supabase.from('predictions').insert({ player_name: name, match_id: id, pred_home: h, pred_away: a });
-            alert("Prediction Saved!");
-            location.reload();
-        }
+    async function loadAdmin() {
+        const { data } = await supabase.from('matches').select('*');
+        document.getElementById('admin-match-list').innerHTML = data.map(m => `
+            <div style="margin-bottom:10px;">${m.home_team} vs ${m.away_team}: 
+            <input id="ah_${m.id}" type="number" value="${m.home_score || 0}">
+            <input id="aa_${m.id}" type="number" value="${m.away_score || 0}">
+            <button onclick="updateScore(${m.id})">Update</button></div>
+        `).join('');
+    }
 
-        function unlockAdmin() {
-            if(prompt("Enter Password:") === "worldcup2026") {
-                document.getElementById('admin-panel').style.display = 'block';
-                loadAdmin();
-            }
-        }
+    async function updateScore(id) {
+        const h = document.getElementById('ah_'+id).value;
+        const a = document.getElementById('aa_'+id).value;
+        await supabase.from('matches').update({ home_score: h, away_score: a }).eq('id', id);
+        alert("Result Updated!");
+        location.reload();
+    }
 
-        async function loadAdmin() {
-            const { data } = await supabase.from('matches').select('*');
-            document.getElementById('admin-match-list').innerHTML = data.map(m => `
-                <div style="margin-bottom:10px;">${m.home_team} vs ${m.away_team}: 
-                <input id="ah_${m.id}" type="number" value="${m.home_score || 0}">
-                <input id="aa_${m.id}" type="number" value="${m.away_score || 0}">
-                <button onclick="updateScore(${m.id})">Update</button></div>
-            `).join('');
-        }
-
-        async function updateScore(id) {
-            const h = document.getElementById('ah_'+id).value;
-            const a = document.getElementById('aa_'+id).value;
-            await supabase.from('matches').update({ home_score: h, away_score: a }).eq('id', id);
-            alert("Result Updated!");
-            location.reload();
-        }
-
-        load();
-    </script>
+    // Run on load
+    load();
+</script>
 </body>
 </html>
