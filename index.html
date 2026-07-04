@@ -4,134 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tournament 2026</title>
-    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     
     <style>
-        :root { 
-            --bg: #F8FAFC; 
-            --card: #FFFFFF; 
-            --primary: #0F172A; 
-            --border: #E2E8F0;
-            --text-muted: #64748B;
-            --accent: #2563EB;
-            --danger: #EF4444;
-            --success: #10B981;
-        }
-        
-        body { 
-            font-family: 'Inter', system-ui, sans-serif; 
-            background: var(--bg); 
-            color: var(--primary); 
-            margin: 0; 
-        }
-        
-        .nav { 
-            background: var(--card); 
-            padding: 1.5rem; 
-            display: flex; 
-            justify-content: center; 
-            gap: 30px; 
-            border-bottom: 1px solid var(--border); 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        
-        .tab { 
-            cursor: pointer; 
-            font-weight: 600; 
-            color: var(--text-muted); 
-            transition: color 0.2s;
-        }
-        
-        .tab:hover, .tab.active { 
-            color: var(--primary); 
-        }
-        
-        .container { 
-            max-width: 1000px; 
-            margin: 2rem auto; 
-            padding: 0 1rem; 
-        }
-        
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
-            gap: 1.25rem; 
-        }
-        
-        .card { 
-            background: var(--card); 
-            border-radius: 12px; 
-            padding: 1.5rem; 
-            border: 1px solid var(--border); 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02); 
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .card small {
-            color: var(--text-muted);
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 0.5px;
-        }
-
-        .match-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 600;
-        }
-
-        .score-input {
-            width: 50px;
-            padding: 6px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-        }
-
-        button {
-            flex: 1;
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: background 0.2s;
-        }
-
+        :root { --bg: #F8FAFC; --card: #FFFFFF; --primary: #0F172A; --border: #E2E8F0; --accent: #2563EB; --danger: #EF4444; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--primary); margin: 0; }
+        .nav { background: var(--card); padding: 1.5rem; display: flex; justify-content: center; gap: 30px; border-bottom: 1px solid var(--border); }
+        .tab { cursor: pointer; font-weight: 600; color: #64748B; }
+        .tab.active { color: var(--primary); }
+        .container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.25rem; }
+        .card { background: var(--card); border-radius: 12px; padding: 1.5rem; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .match-row { display: flex; justify-content: space-between; align-items: center; font-weight: 600; margin-bottom: 8px; }
+        .score-input { width: 45px; padding: 6px; border: 1px solid var(--border); border-radius: 6px; text-align: center; }
+        button { padding: 8px 12px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; }
         .btn-primary { background: var(--accent); color: white; }
-        .btn-primary:hover { background: #1d4ed8; }
         .btn-danger { background: var(--danger); color: white; }
-        .btn-danger:hover { background: #dc2626; }
-        
-        #status-bar {
-            text-align: center;
-            padding: 10px;
-            font-weight: bold;
-            margin-bottom: 1rem;
-        }
-        .error { color: #DC2626; background: #FEE2E2; border-radius: 8px; }
-        .success { color: #16A34A; background: #DCFCE7; border-radius: 8px; }
-
-        .admin-section {
-            margin-top: 3rem;
-            border-top: 2px dashed var(--border);
-            padding-top: 2rem;
-        }
+        #status-bar { text-align: center; padding: 10px; font-weight: bold; margin-bottom: 1rem; display: none; }
     </style>
 </head>
 <body>
@@ -142,289 +32,87 @@
         <div class="tab" onclick="showTab('leaderboard', this)">📈 Leaderboard</div>
     </div>
 
-    <div class="container">
-        <div id="status-bar" style="display:none;"></div>
-    </div>
+    <div class="container"><div id="status-bar"></div></div>
 
     <div id="dashboard" class="container">
         <div class="grid" id="bracket-grid"></div>
-        
-        <div class="admin-section">
-            <h2>⚙️ Commissioner Tools (Admin Match Updates)</h2>
+        <div style="margin-top: 3rem; border-top: 2px dashed var(--border); padding-top: 2rem;">
+            <h2>⚙️ Commissioner Tools</h2>
             <div class="grid" id="admin-grid"></div>
         </div>
     </div>
 
     <div id="predict" class="container" style="display:none">
-        <h2>✍️ Submit Your Predictions</h2>
-        <div style="margin-bottom: 1.5rem;">
-            <label style="font-weight: 600;">Your Name: </label>
-            <input type="text" id="player-name" placeholder="Enter your name" style="padding: 8px; border: 1px solid var(--border); border-radius: 6px;">
-        </div>
+        <h2>✍️ Predictions</h2>
+        <input type="text" id="player-name" placeholder="Your Name" style="padding:8px; margin-bottom:10px;">
         <div class="grid" id="predict-grid"></div>
     </div>
 
     <div id="leaderboard" class="container" style="display:none">
         <h2>📈 Standings</h2>
-        <div class="card" id="leaderboard-card">
-            <p>Standings will compute automatically once predictions and matches are saved.</p>
-        </div>
+        <div class="card" id="leaderboard-card"></div>
     </div>
 
     <script>
-        // ==========================================
-        // 1. SUPABASE INITIALIZATION
-        // ==========================================
         const CONFIG_URL = 'https://yvkbmelrvdfdjlbanciv.supabase.co'; 
         const CONFIG_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2a2JtZWxydmRmZGpsYmFuY2l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxNjM1ODksImV4cCI6MjA5ODczOTU4OX0.BP6DzEGRInduT3bueKlJRoJNGP9I4Pwk7HKxiBGF4A0';
-        
-        const clientInstance = window.supabase.createClient(CONFIG_URL, CONFIG_KEY);
+        const db = window.supabase.createClient(CONFIG_URL, CONFIG_KEY);
         let allMatches = [];
 
-        // ==========================================
-        // 2. UI NAVIGATION LOGIC
-        // ==========================================
-        function showTab(tabId, element) {
-            document.getElementById('dashboard').style.display = 'none';
-            document.getElementById('predict').style.display = 'none';
-            document.getElementById('leaderboard').style.display = 'none';
-            
+        function showTab(id, el) {
+            document.getElementById('dashboard').style.display = (id === 'dashboard') ? 'block' : 'none';
+            document.getElementById('predict').style.display = (id === 'predict') ? 'block' : 'none';
+            document.getElementById('leaderboard').style.display = (id === 'leaderboard') ? 'block' : 'none';
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            
-            document.getElementById(tabId).style.display = 'block';
-            if (element) element.classList.add('active');
+            el.classList.add('active');
         }
 
-        function showStatus(message, isError = false) {
-            const statusBar = document.getElementById('status-bar');
-            statusBar.style.display = 'block';
-            statusBar.className = isError ? 'error' : 'success';
-            statusBar.textContent = message;
-            setTimeout(() => { statusBar.style.display = 'none'; }, 5000);
-        }
-
-        // ==========================================
-        // 3. CORE TOURNAMENT ENGINE RENDERERS
-        // ==========================================
         async function initializeApp() {
-            try {
-                const { data, error } = await clientInstance
-                    .from('matches')
-                    .select('*')
-                    .order('id');
-                
-                if (error) throw error;
-                allMatches = data || [];
-
-                renderDashboard();
-                renderAdminPanel();
-                renderPredictPanel();
-                calculateLeaderboard();
-
-            } catch (err) {
-                console.error(err);
-                showStatus(`Connection Error: ${err.message}`, true);
-            }
+            const { data } = await db.from('matches').select('*').order('id');
+            allMatches = data || [];
+            renderUI();
         }
 
-        function renderDashboard() {
-            const grid = document.getElementById('bracket-grid');
-            grid.innerHTML = allMatches.map(m => `
-                <div class="card">
-                    <small>Match ID ${m.id} • ${m.round_name}</small>
-                    <div class="match-row">
-                        <span>${m.home_team || 'TBD'}</span>
-                        <span>${m.home_score ?? '-'}</span>
-                    </div>
-                    <div class="match-row">
-                        <span>${m.away_team || 'TBD'}</span>
-                        <span>${m.away_score ?? '-'}</span>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderAdminPanel() {
-            const grid = document.getElementById('admin-grid');
-            grid.innerHTML = allMatches.map(m => `
-                <div class="card">
-                    <small>${m.round_name} (ID: ${m.id})</small>
-                    <div class="match-row">
-                        <label>${m.home_team || 'TBD'}</label>
-                        <input type="number" id="admin-h-${m.id}" class="score-input" value="${m.home_score ?? ''}">
-                    </div>
-                    <div class="match-row">
-                        <label>${m.away_team || 'TBD'}</label>
-                        <input type="number" id="admin-a-${m.id}" class="score-input" value="${m.away_score ?? ''}">
-                    </div>
-                    <div class="btn-group">
-                        <button class="btn-primary" onclick="saveMatchResult(${m.id})">Save</button>
-                        <button class="btn-danger" onclick="resetMatchResult(${m.id})">Reset</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderPredictPanel() {
-            const grid = document.getElementById('predict-grid');
-            grid.innerHTML = allMatches.map(m => `
+        function renderUI() {
+            document.getElementById('bracket-grid').innerHTML = allMatches.map(m => `
                 <div class="card">
                     <small>${m.round_name}</small>
-                    <div class="match-row">
-                        <label>${m.home_team || 'TBD'}</label>
-                        <input type="number" id="pred-h-${m.id}" class="score-input">
+                    <div class="match-row">${m.home_team || 'TBD'} <span>${m.home_score ?? '-'}</span></div>
+                    <div class="match-row">${m.away_team || 'TBD'} <span>${m.away_score ?? '-'}</span></div>
+                </div>
+            `).join('');
+
+            document.getElementById('admin-grid').innerHTML = allMatches.map(m => `
+                <div class="card">
+                    <small>${m.round_name} (ID: ${m.id})</small>
+                    <div class="match-row">${m.home_team || 'TBD'} 
+                        <input type="number" id="h-${m.id}" class="score-input" value="${m.home_score ?? ''}">
+                        <input type="number" id="hp-${m.id}" class="score-input" style="background:#eee" placeholder="P" value="${m.home_pen ?? ''}">
                     </div>
-                    <div class="match-row">
-                        <label>${m.away_team || 'TBD'}</label>
-                        <input type="number" id="pred-a-${m.id}" class="score-input">
+                    <div class="match-row">${m.away_team || 'TBD'} 
+                        <input type="number" id="a-${m.id}" class="score-input" value="${m.away_score ?? ''}">
+                        <input type="number" id="ap-${m.id}" class="score-input" style="background:#eee" placeholder="P" value="${m.away_pen ?? ''}">
                     </div>
-                    <button class="btn-primary" style="margin-top:8px;" onclick="submitPrediction(${m.id})">Save Prediction</button>
+                    <button class="btn-primary" onclick="saveMatch(${m.id})">Save</button>
+                    <button class="btn-danger" onclick="resetMatch(${m.id})">Reset</button>
                 </div>
             `).join('');
         }
 
-        // ==========================================
-        // 4. ADMIN WRITE ACTIONS
-        // ==========================================
-        async function saveMatchResult(id) {
-            const homeInput = document.getElementById(`admin-h-${id}`).value;
-            const awayInput = document.getElementById(`admin-a-${id}`).value;
-
-            if (homeInput === '' || awayInput === '') {
-                alert('Please enter scores for both teams.');
-                return;
-            }
-
-            const { error } = await clientInstance
-                .from('matches')
-                .update({ 
-                    home_score: parseInt(homeInput, 10), 
-                    away_score: parseInt(awayInput, 10) 
-                })
-                .eq('id', id);
-
-            if (error) {
-                alert(`Error saving result: ${error.message}`);
-            } else {
-                showStatus(`Match ${id} saved successfully!`);
-                await initializeApp(); 
-            }
+        async function saveMatch(id) {
+            const data = {
+                home_score: parseInt(document.getElementById(`h-${id}`).value) || null,
+                away_score: parseInt(document.getElementById(`a-${id}`).value) || null,
+                home_pen: parseInt(document.getElementById(`hp-${id}`).value) || null,
+                away_pen: parseInt(document.getElementById(`ap-${id}`).value) || null
+            };
+            await db.from('matches').update(data).eq('id', id);
+            initializeApp();
         }
 
-        async function resetMatchResult(id) {
-            const { error } = await clientInstance
-                .from('matches')
-                .update({ 
-                    home_score: null, 
-                    away_score: null
-                })
-                .eq('id', id);
-
-            if (error) {
-                alert(`Error during reset: ${error.message}`);
-            } else {
-                // Instantly wipe forms clear visually
-                document.getElementById(`admin-h-${id}`).value = '';
-                document.getElementById(`admin-a-${id}`).value = '';
-                showStatus(`Match ${id} scores cleared.`);
-                await initializeApp();
-            }
-        }
-
-        // ==========================================
-        // 5. USER PREDICTION ACTIONS
-        // ==========================================
-        async function submitPrediction(matchId) {
-            const playerName = document.getElementById('player-name').value.trim();
-            const predHome = document.getElementById(`pred-h-${matchId}`).value;
-            const predAway = document.getElementById(`pred-a-${matchId}`).value;
-
-            if (!playerName) {
-                alert('Please enter your name at the top before submitting.');
-                return;
-            }
-            if (predHome === '' || predAway === '') {
-                alert('Please fill out both scores for your prediction.');
-                return;
-            }
-
-            let winnerTeam = null;
-            const targetMatch = allMatches.find(m => m.id === matchId);
-            if (parseInt(predHome) > parseInt(predAway)) winnerTeam = targetMatch.home_team;
-            if (parseInt(predAway) > parseInt(predHome)) winnerTeam = targetMatch.away_team;
-
-            const { error } = await clientInstance
-                .from('predictions')
-                .insert([{
-                    player_name: playerName,
-                    match_id: matchId,
-                    pred_home: parseInt(predHome, 10),
-                    pred_away: parseInt(predAway, 10),
-                    pred_winner: winnerTeam
-                }]);
-
-            if (error) {
-                alert(`Error saving prediction: ${error.message}`);
-            } else {
-                showStatus(`Prediction recorded for ${playerName}!`);
-            }
-        }
-
-        // ==========================================
-        // 6. REAL-TIME LEADERBOARD LOGIC
-        // ==========================================
-        async function calculateLeaderboard() {
-            const { data: predictions, error } = await clientInstance
-                .from('predictions')
-                .select('*');
-            
-            if (error || !predictions) return;
-
-            const scores = {};
-
-            predictions.forEach(p => {
-                const actual = allMatches.find(m => m.id === p.match_id);
-                if (!actual || actual.home_score === null || actual.away_score === null) return;
-
-                if (!scores[p.player_name]) scores[p.player_name] = 0;
-
-                const actualWinner = actual.home_score > actual.away_score ? actual.home_team : (actual.away_score > actual.home_score ? actual.away_team : null);
-                if (p.pred_winner === actualWinner && actualWinner !== null) {
-                    scores[p.player_name] += 3;
-                }
-            });
-
-            const sortedPlayers = Object.keys(scores).map(name => ({
-                name: name,
-                points: scores[name]
-            })).sort((a, b) => b.points - a.points);
-
-            const container = document.getElementById('leaderboard-card');
-            if (sortedPlayers.length === 0) {
-                container.innerHTML = `<p>No parsed results available yet. Start updating matches to see standings.</p>`;
-                return;
-            }
-
-            container.innerHTML = `
-                <table style="width:100%; border-collapse:collapse; text-align:left;">
-                    <thead>
-                        <tr style="border-bottom:2px solid var(--border); color:var(--text-muted);">
-                            <th style="padding:8px;">Rank</th>
-                            <th style="padding:8px;">Player</th>
-                            <th style="padding:8px;">Points</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${sortedPlayers.map((player, idx) => `
-                            <tr style="border-bottom:1px solid var(--border);">
-                                <td style="padding:8px; font-weight:700;">#${idx + 1}</td>
-                                <td style="padding:8px;">${player.name}</td>
-                                <td style="padding:8px; font-weight:700; color:var(--accent);">${player.points} pts</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
+        async function resetMatch(id) {
+            await db.from('matches').update({home_score:null, away_score:null, home_pen:null, away_pen:null}).eq('id', id);
+            initializeApp();
         }
 
         window.addEventListener('DOMContentLoaded', initializeApp);
