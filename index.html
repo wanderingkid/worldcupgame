@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WC 2026 Prediction Portal</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0"></script>
+    <style>
+        body { font-family: sans-serif; background: #f8f9fa; padding: 20px; text-align: center; }
+        .match-card { background: white; padding: 15px; margin: 15px auto; max-width: 400px; border-radius: 12px; border-left: 5px solid #2A398D; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        input { width: 50px; padding: 5px; }
+        button { background: #E61D25; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>🏆 FIFA WORLD CUP 2026</h1>
+    <div id="app"></div>
+
+    <script>
+        const supabase = supabase.createClient('https://yvkbmelrvdfdjlbanciv.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2a2JtZWxydmRmZGpsYmFuY2l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxNjM1ODksImV4cCI6MjA5ODczOTU4OX0.BP6DzEGRInduT3bueKlJRoJNGP9I4Pwk7HKxiBGF4A0');
+
+        async function loadMatches() {
+            const { data } = await supabase.from('matches').select('*');
+            document.getElementById('app').innerHTML = data.map(m => `
+                <div class="match-card">
+                    <strong>${m.home_team} vs ${m.away_team}</strong><br>
+                    <input type="number" id="h_${m.id}" placeholder="H">
+                    <input type="number" id="a_${m.id}" placeholder="A">
+                    <button onclick="save(${m.id})">Predict</button>
+                </div>
+            `).join('');
+        }
+
+        async function save(id) {
+            const player = prompt("Enter your name:");
+            if(!player) return;
+            const h = document.getElementById(`h_${id}`).value;
+            const a = document.getElementById(`a_${id}`).value;
+            await supabase.from('predictions').upsert({ player_name: player, match_id: id, pred_home: h, pred_away: a });
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            alert("🎉 Yay! Prediction saved!");
+        }
+
+        if(prompt("Enter Group Password") === "worldcup2026") loadMatches();
+        else document.body.innerHTML = "<h1>Access Denied</h1>";
+    </script>
+</body>
+</html>
