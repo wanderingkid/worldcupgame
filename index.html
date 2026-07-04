@@ -20,6 +20,7 @@
             --danger: #EF4444; 
             --winner-bg: rgba(16, 185, 129, 0.1);
             --winner-text: #10B981;
+            --warning: #F59E0B;
         }
 
         body { 
@@ -86,6 +87,7 @@
         .form-card.saved-state { border-color: rgba(16, 185, 129, 0.3); }
 
         .match-locked-overlay { background: rgba(239, 68, 68, 0.15); border: 1px solid var(--danger); padding: 8px; border-radius: 6px; text-align: center; font-size: 0.75rem; color: var(--danger); font-weight: bold; margin-bottom: 12px; letter-spacing: 0.5px; }
+        .match-locked-overlay.awarded { background: rgba(16, 185, 129, 0.15); border-color: var(--winner-text); color: var(--winner-text); }
 
         .input-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .score-input { width: 45px; padding: 8px; border: 1px solid var(--border); border-radius: 6px; text-align: center; background: rgba(0, 0, 0, 0.4); color: #FFFFFF; font-family: 'Montserrat', sans-serif; font-weight: 700; }
@@ -113,6 +115,7 @@
         .leaderboard-table tr:hover td { background: rgba(255,255,255,0.01); }
         
         .winner-flag-tag { background: rgba(245, 158, 11, 0.15); color: #F59E0B; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; margin-left: auto; display: inline-flex; align-items: center; gap: 3px; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .country-flag { font-size: 1.25rem; line-height: 1; vertical-align: middle; }
     </style>
 </head>
 <body>
@@ -151,9 +154,9 @@
         let allMatches = [];
         let userPredictions = [];
         let internalDrawWinners = {}; 
-        let adminDrawWinners = {};
         let unlockedPredictions = {}; 
 
+        // Universal Regional Indicator Flag dictionary
         const flagMap = {
             "Argentina": "🇦🇷", "Brazil": "🇧🇷", "France": "🇫🇷", "Germany": "🇩🇪",
             "Italy": "🇮🇹", "Spain": "🇪🇸", "England": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Portugal": "🇵🇹",
@@ -163,7 +166,9 @@
 
         function getFlag(teamName) {
             if (!teamName) return '';
-            return flagMap[teamName] || '';
+            // Cleans dynamic prefixes if any slide into strings
+            const cleanName = teamName.replace(/^[A-Z]{2}\s*-\s*/i, '').trim();
+            return flagMap[cleanName] ? `<span class="country-flag">${flagMap[cleanName]}</span>` : '';
         }
 
         function showTab(id, el) {
@@ -173,6 +178,7 @@
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
             if(id === 'leaderboard') calculateLeaderboard();
+            if(id === 'predict') renderUI(); 
         }
 
         async function initializeApp() {
@@ -216,14 +222,31 @@
             renderUI();
         }
 
-        function setAdminDrawWinner(matchId, selectedTeam) {
-            adminDrawWinners[matchId] = selectedTeam;
-            renderUI();
-        }
-
-        function unlockPredictionSlot(matchId) {
-            unlockedPredictions[matchId] = true;
-            renderUI();
+        function calculateMatchPoints(m, p) {
+            if (!m || m.home_score === null || m.away_score === null || !p) return null;
+            
+            const actualHome = m.home_score;
+            const actualAway = m.away_score;
+            const predHome = p.pred_home;
+            const predAway = p.pred_away;
+            
+            if (actualHome === predHome && actualAway === predAway) return 3;
+            
+            let actualOutcome = 'draw';
+            if (actualHome > actualAway) actualOutcome = 'home';
+            if (actualAway > actualHome) actualOutcome = 'away';
+            
+            let predOutcome = 'draw';
+            if (predHome > predAway) predOutcome = 'home';
+            if (predAway > predHome) predOutcome = 'away';
+            
+            if (actualOutcome === predOutcome) {
+                if (actualOutcome === 'draw') {
+                    return (m.winner_team === p.pred_winner) ? 1 : 0;
+                }
+                return 1;
+            }
+            return 0;
         }
 
         function renderUI() {
@@ -243,51 +266,49 @@
                 </div>
             `;
 
+            // Admin Input Panels
             document.getElementById('admin-grid').innerHTML = allMatches.map(m => {
-                let adminDrawHTML = '';
-                const hVal = document.getElementById(`h-${m.id}`)?.value || (m.home_score ?? '');
-                const aVal = document.getElementById(`a-${m.id}`)?.value || (m.away_score ?? '');
-                
-                if (hVal !== '' && aVal !== '' && parseInt(hVal) === parseInt(aVal) && m.home_team && m.away_team) {
-                    const chosen = adminDrawWinners[m.id] || m.winner_team || '';
-                    adminDrawHTML = `
-                        <div class="draw-select-box" style="border-color: var(--danger); background: rgba(239,68,68,0.05)">
-                            <small style="color:var(--danger); display:block; margin-bottom:4px; font-weight:bold;">Draw Outcome: Who advances?</small>
-                            <button class="draw-btn ${chosen === m.home_team ? 'active' : ''}" onclick="setAdminDrawWinner(${m.id}, '${m.home_team}')">${m.home_team}</button>
-                            <button class="draw-btn ${chosen === m.away_team ? 'active' : ''}" onclick="setAdminDrawWinner(${m.id}, '${m.away_team}')">${m.away_team}</button>
-                        </div>
-                    `;
-                }
-
+                const hVal = m.home_score ?? '';
+                const aVal = m.away_score ?? '';
                 return `
                     <div class="form-card ${m.home_score !== null ? 'saved-state' : ''}">
                         <div class="match-id-badge" style="background:transparent; padding:0 0 8px 0; margin-bottom:8px;">${m.round_name} (ID: ${m.id})</div>
                         <div class="input-row">
                             <span class="team-name">${getFlag(m.home_team)} ${m.home_team || 'TBD'}</span>
                             <div>
-                                <input type="number" id="h-${m.id}" class="score-input" placeholder="FT" value="${hVal}" oninput="renderUI()">
+                                <input type="number" id="h-${m.id}" class="score-input" placeholder="FT" value="${hVal}">
                                 <input type="number" id="hp-${m.id}" class="score-input" style="border-color:rgba(16,185,129,0.3)" placeholder="PK" value="${m.home_pen ?? ''}">
                             </div>
                         </div>
                         <div class="input-row">
                             <span class="team-name">${getFlag(m.away_team)} ${m.away_team || 'TBD'}</span>
                             <div>
-                                <input type="number" id="a-${m.id}" class="score-input" placeholder="FT" value="${aVal}" oninput="renderUI()">
+                                <input type="number" id="a-${m.id}" class="score-input" placeholder="FT" value="${aVal}">
                                 <input type="number" id="ap-${m.id}" class="score-input" style="border-color:rgba(16,185,129,0.3)" placeholder="PK" value="${m.away_pen ?? ''}">
                             </div>
                         </div>
-                        ${adminDrawHTML}
                         <button class="btn-primary" onclick="saveMatch(${m.id})">Commit Result</button>
                         <button class="btn-danger" onclick="resetMatch(${m.id})">Clear Node</button>
                     </div>
                 `;
             }).join('');
 
+            // Predictions Panels
             document.getElementById('predict-grid').innerHTML = allMatches.map(m => {
                 const existing = userPredictions.find(p => p.match_id === m.id);
                 const isMatchStarted = m.home_score !== null; 
                 const isLocked = (existing && !unlockedPredictions[m.id]) || isMatchStarted;
                 
+                let lockBannerHTML = '';
+                if (isMatchStarted) {
+                    const pts = calculateMatchPoints(m, existing);
+                    if (pts !== null) {
+                        lockBannerHTML = `<div class="match-locked-overlay awarded">🏆 MATCH LOCKED (+${pts} PTS AWARDED)</div>`;
+                    } else {
+                        lockBannerHTML = '<div class="match-locked-overlay">⚠️ MATCH LOCKED: RESULT COMMITTED</div>';
+                    }
+                }
+
                 let predictDrawHTML = '';
                 const phVal = document.getElementById(`ph-${m.id}`)?.value || (existing ? existing.pred_home : '');
                 const paVal = document.getElementById(`pa-${m.id}`)?.value || (existing ? existing.pred_away : '');
@@ -309,7 +330,7 @@
                 return `
                     <div class="form-card ${isLocked ? 'locked' : ''} ${existing && !isLocked ? 'saved-state' : ''}">
                         <div class="match-id-badge" style="background:transparent; padding:0 0 8px 0; margin-bottom:8px;">${m.round_name}</div>
-                        ${isMatchStarted ? '<div class="match-locked-overlay">MATCH LOCKED: RESULT COMMITTED</div>' : ''}
+                        ${lockBannerHTML}
                         
                         <div class="input-row">
                             <span class="team-name">
@@ -342,15 +363,20 @@
             const hp = document.getElementById(`hp-${id}`).value;
             const ap = document.getElementById(`ap-${id}`).value;
 
-            if(h === '' || a === '') return alert('Please input score metrics.');
+            if(h === '' || a === '') return alert('Please input baseline metrics.');
 
             let winner = null;
             const target = allMatches.find(m => m.id === id);
-            if (parseInt(h) > parseInt(a)) winner = target.home_team;
-            else if (parseInt(a) > parseInt(h)) winner = target.away_team;
-            else {
-                winner = adminDrawWinners[id] || target.winner_team;
-                if (!winner) return alert('Provide advancing validation team for ties.');
+            
+            if (parseInt(h) > parseInt(a)) {
+                winner = target.home_team;
+            } else if (parseInt(a) > parseInt(h)) {
+                winner = target.away_team;
+            } else {
+                // Ties determine winner via Penalties (PK values)
+                if (hp === '' || ap === '') return alert('Draws require PK penalty inputs to identify the advancing team!');
+                if (parseInt(hp) === parseInt(ap)) return alert('Penalty shootout targets cannot end in a tie score.');
+                winner = (parseInt(hp) > parseInt(ap)) ? target.home_team : target.away_team;
             }
 
             const data = {
@@ -367,17 +393,16 @@
 
         async function resetMatch(id) {
             await db.from('matches').update({home_score:null, away_score:null, home_pen:null, away_pen:null, winner_team:null}).eq('id', id);
-            if(adminDrawWinners[id]) delete adminDrawWinners[id];
             await initializeApp();
         }
 
         async function savePrediction(matchId) {
             const name = document.getElementById('player-name').value.trim();
-            if (!name) return alert('Input your player name first.');
+            if (!name) return alert('Input your player name tracking identifier.');
             
             const h = document.getElementById(`ph-${matchId}`).value;
             const a = document.getElementById(`pa-${matchId}`).value;
-            if (h === '' || a === '') return alert('Ensure fields contain numeric values.');
+            if (h === '' || a === '') return alert('Ensure prediction configurations are filled.');
 
             let winnerTeam = null;
             const targetMatch = allMatches.find(m => m.id === matchId);
@@ -390,7 +415,7 @@
                     const existing = userPredictions.find(p => p.match_id === matchId);
                     winnerTeam = existing ? existing.pred_winner : null;
                 }
-                if (!winnerTeam) return alert('For tied guesses, select your advancing team.');
+                if (!winnerTeam) return alert('For drawn projections, select which team advances.');
             }
 
             const payload = {
@@ -409,7 +434,7 @@
             }
             
             unlockedPredictions[matchId] = false;
-            alert('Prediction saved.');
+            alert('Prediction locked.');
             await loadUserPredictions();
         }
 
@@ -420,30 +445,11 @@
             let standings = {};
             preds.forEach(p => {
                 const match = allMatches.find(m => m.id === p.match_id);
-                if (!match || match.home_score === null || match.away_score === null) return;
-                
-                if (!standings[p.player_name]) standings[p.player_name] = 0;
-                
-                const actualHome = match.home_score;
-                const actualAway = match.away_score;
-                const predHome = p.pred_home;
-                const predAway = p.pred_away;
-                
-                const exactMatch = (actualHome === predHome && actualAway === predAway);
-                
-                let actualOutcome = 'draw';
-                if (actualHome > actualAway) actualOutcome = 'home';
-                if (actualAway > actualHome) actualOutcome = 'away';
-                
-                let predOutcome = 'draw';
-                if (predHome > predAway) predOutcome = 'home';
-                if (predAway > predHome) predOutcome = 'away';
-                
-                const correctOutcome = (actualOutcome === predOutcome);
-                const correctWinner = (actualOutcome === 'draw') ? (match.winner_team === p.pred_winner) : correctOutcome;
-
-                if (exactMatch) standings[p.player_name] += 3;
-                else if (correctWinner) standings[p.player_name] += 1;
+                const pointsAwarded = calculateMatchPoints(match, p);
+                if (pointsAwarded !== null) {
+                    if (!standings[p.player_name]) standings[p.player_name] = 0;
+                    standings[p.player_name] += pointsAwarded;
+                }
             });
 
             const sorted = Object.keys(standings).map(name => ({ name, points: standings[name] })).sort((a,b) => b.points - a.points);
