@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>World Cup Tournament Bracket 2026</title>
+    <title>World Cup Knockout Bracket 2026</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     
     <style>
         :root { 
-            --bg-gradient: radial-gradient(circle at top right, #F8FAFC 0%, #F1F5F9 60%, #E2E8F0 100%);
+            /* Immersive Dark Theme from image_acbdac_2.jpg */
+            --bg-gradient: radial-gradient(circle at 50% 30%, #102A54 0%, #050C1A 70%, #02050B 100%);
             --card-base: #FFFFFF; 
             --border-light: #E2E8F0;
             --border-dark: #0F172A;
@@ -19,13 +20,13 @@
             --winner-bg: #DCFCE7;
             --winner-text: #166534;
             
-            /* Enhanced Darker Headers with Complementary Deep Pastel Accents */
-            --r16-header: #0284C7; /* Stronger Sky Blue */
-            --qf-header: #7C3AED;  /* Stronger Violet */
-            --sf-header: #D97706;  /* Stronger Amber */
-            --fn-header: #059669;  /* Stronger Emerald */
+            /* High-Contrast Match Headers */
+            --r16-header: #0284C7; 
+            --qf-header: #7C3AED;  
+            --sf-header: #D97706;  
+            --fn-header: #059669;  
             
-            /* High-Contrast Notice Colors */
+            /* High-Contrast Notification Systems */
             --lock-bg: #F1F5F9;
             --lock-text: #334155;
             --lock-border: #CBD5E1;
@@ -37,87 +38,116 @@
         body { 
             font-family: 'Space Grotesk', system-ui, sans-serif; 
             background: var(--bg-gradient);
-            color: var(--text-main); 
+            color: #FFFFFF; 
             margin: 0; 
             min-height: 100vh;
         }
 
+        /* Glassmorphism Header Bar */
         .nav { 
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(16px);
+            background: rgba(5, 12, 26, 0.8);
+            backdrop-filter: blur(20px);
             padding: 1.25rem; 
             display: flex; 
             justify-content: center; 
             gap: 30px; 
-            border-bottom: 2px solid var(--border-light);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
         
         .tab { 
             cursor: pointer; 
             font-weight: 800; 
             font-family: 'Montserrat', sans-serif;
-            color: var(--text-muted); 
+            color: #94A3B8; 
             transition: all 0.2s ease;
             font-size: 0.95rem;
             letter-spacing: 0.5px;
-            position: relative;
-            padding: 8px 20px;
+            padding: 10px 24px;
             border-radius: 30px;
         }
         
-        .tab:hover { color: var(--text-main); background: #F8FAFC; }
-        .tab.active { color: #FFFFFF; background: var(--border-dark); box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15); }
+        .tab:hover { color: #FFFFFF; background: rgba(255, 255, 255, 0.05); }
+        .tab.active { color: #FFFFFF; background: var(--accent-blue); box-shadow: 0 0 20px rgba(37, 99, 235, 0.4); }
 
         .container { max-width: 1400px; margin: 2.5rem auto; padding: 0 1.5rem; }
-
-        .bracket-wrapper { display: flex; gap: 2.5rem; overflow-x: auto; padding: 1.5rem 0; align-items: center; justify-content: flex-start; }
-        .bracket-column { display: flex; flex-direction: column; gap: 2.2rem; min-width: 290px; flex: 1; }
-        .column-header { font-family: 'Montserrat', sans-serif; font-size: 0.85rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color: var(--text-main); text-align: center; margin-bottom: 0.5rem; background: #FFFFFF; padding: 10px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border: 1px solid var(--border-light); }
-
-        /* Premium White Base Cards */
-        .match-card { background: var(--card-base); border-radius: 16px; border: 2px solid var(--border-light); box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05); overflow: hidden; transition: border-color 0.2s ease; }
         
-        /* Darker Header Variants */
+        .page-title {
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 24px rgba(37, 99, 235, 0.3);
+        }
+
+        .bracket-wrapper { display: flex; gap: 2.5rem; overflow-x: auto; padding: 2rem 0; align-items: center; justify-content: flex-start; }
+        .bracket-column { display: flex; flex-direction: column; gap: 2.5rem; min-width: 300px; flex: 1; }
+        
+        .column-header { 
+            font-family: 'Montserrat', sans-serif; 
+            font-size: 0.85rem; 
+            font-weight: 900; 
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+            color: #FFFFFF; 
+            text-align: center; 
+            margin-bottom: 0.5rem; 
+            background: rgba(255, 255, 255, 0.05); 
+            padding: 12px; 
+            border-radius: 12px; 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+        }
+
+        /* Sleek Capsule Cards matching reference layout style */
+        .match-card { 
+            background: var(--card-base); 
+            border-radius: 20px; 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4); 
+            overflow: hidden; 
+            transition: transform 0.2s ease; 
+        }
+        .match-card:hover { transform: translateY(-2px); }
+        
         .round-r16 .match-id-badge { background: var(--r16-header); color: #FFFFFF; }
         .round-qf .match-id-badge { background: var(--qf-header); color: #FFFFFF; }
         .round-sf .match-id-badge { background: var(--sf-header); color: #FFFFFF; }
         .round-fn .match-id-badge { background: var(--fn-header); color: #FFFFFF; }
 
-        .match-id-badge { font-family: 'Montserrat', sans-serif; font-size: 0.75rem; padding: 14px 16px; font-weight: 900; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; }
+        .match-id-badge { font-family: 'Montserrat', sans-serif; font-size: 0.75rem; padding: 14px 18px; font-weight: 900; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; }
 
-        .team-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; font-weight: 700; border-bottom: 1px solid var(--border-light); color: var(--text-main); }
+        .team-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; font-weight: 700; border-bottom: 1px solid var(--border-light); color: var(--text-main); }
         .team-row:last-child { border-bottom: none; }
         .team-row.tbd { color: var(--text-muted); font-weight: 500; }
-        .team-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; font-size: 1rem; }
+        .team-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; font-size: 0.95rem; }
         
         .score-display { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; display: inline-flex; align-items: center; gap: 6px; color: var(--text-main); }
-        .penalty-badge { font-size: 0.75rem; color: var(--winner-text); background: #CAFBP2; padding: 2px 6px; border-radius: 4px; font-weight: 800; border: 1px solid rgba(22, 101, 52, 0.2); }
+        .penalty-badge { font-size: 0.75rem; color: var(--winner-text); background: #CAFCF2; padding: 2px 6px; border-radius: 4px; font-weight: 800; }
         
         .team-row.winner { background: var(--winner-bg); color: var(--winner-text); }
         .team-row.winner .score-display { color: var(--winner-text); font-weight: 900; }
 
-        .admin-section-title { font-family: 'Montserrat', sans-serif; margin-top: 5rem; border-top: 2px solid #CBD5E1; padding-top: 3rem; font-size: 1.75rem; color: var(--text-main); text-align: center; font-weight: 900; }
-        .standard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem; margin-top: 1.5rem; }
+        .admin-section-title { font-family: 'Montserrat', sans-serif; margin-top: 6rem; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 4rem; font-size: 1.75rem; color: #FFFFFF; text-align: center; font-weight: 900; }
+        .standard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem; margin-top: 2rem; }
         
-        /* Functional Forms */
-        .form-card { background: var(--card-base); border: 2px solid var(--border-light); border-radius: 16px; overflow: hidden; position: relative; transition: all 0.2s ease; box-shadow: 0 8px 20px rgba(0,0,0,0.02); }
+        .form-card { background: var(--card-base); border-radius: 20px; overflow: hidden; position: relative; box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
         .form-card-body { padding: 1.5rem; }
-        .form-card.locked { opacity: 0.9; background: #FAFAFA; }
+        .form-card.locked { opacity: 0.95; }
 
-        /* Highly Visible Status Ribbons */
+        /* Status Ribbons */
         .status-ribbon { padding: 10px; text-align: center; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.5px; border-bottom: 2px solid transparent; }
-        .status-ribbon.updated { background: var(--winner-bg); color: var(--winner-text); border-bottom-color: rgba(22, 101, 52, 0.15); }
+        .status-ribbon.updated { background: var(--winner-bg); color: var(--winner-text); }
         .status-ribbon.locked-banner { background: var(--lock-bg); color: var(--lock-text); border-bottom-color: var(--lock-border); }
         .status-ribbon.awarded-banner { background: var(--awarded-bg); color: var(--awarded-text); border-bottom-color: var(--awarded-border); }
 
         .input-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; color: var(--text-main); font-weight: 700; }
-        .score-input { width: 52px; padding: 8px 4px; border: 2px solid #CBD5E1; border-radius: 8px; text-align: center; background: #FFFFFF; color: var(--text-main); font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.1rem; }
-        .score-input:focus { border-color: var(--accent-blue); outline: none; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
-        .score-input:disabled { background: #F1F5F9; color: var(--text-muted); cursor: not-allowed; border-color: #E2E8F0; }
+        .score-input { width: 54px; padding: 8px 4px; border: 2px solid #CBD5E1; border-radius: 8px; text-align: center; background: #FFFFFF; color: var(--text-main); font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.1rem; }
+        .score-input:focus { border-color: var(--accent-blue); outline: none; }
+        .score-input:disabled { background: #F1F5F9; color: var(--text-muted); cursor: not-allowed; }
 
         button { padding: 12px 14px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; font-family: 'Montserrat', sans-serif; font-size: 0.85rem; transition: all 0.2s ease; margin-top: 8px; width: 100%; letter-spacing: 0.5px; text-transform: uppercase; }
         .btn-primary { background: var(--border-dark); color: white; }
@@ -126,29 +156,27 @@
         .btn-danger:hover { background: #FEE2E2; }
         
         .lock-indicator { display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--accent-blue); font-weight: 800; font-size: 0.85rem; background: rgba(37, 99, 235, 0.08); padding: 12px; border-radius: 8px; cursor: pointer; margin-top: 8px; border: 2px solid rgba(37, 99, 235, 0.15); }
-        .lock-indicator:hover { background: rgba(37, 99, 235, 0.15); }
         
         .draw-select-box { background: rgba(37, 99, 235, 0.04); border: 2px dashed #93C5FD; padding: 12px; border-radius: 10px; margin-bottom: 14px; text-align: center; }
-        .draw-btn { background: #FFFFFF; color: var(--text-main); padding: 8px 14px; border-radius: 6px; font-size: 0.8rem; margin: 4px; display: inline-block; width: auto; border: 2px solid #CBD5E1; font-weight: 800; cursor: pointer; }
+        .draw-btn { background: #FFFFFF; color: var(--text-main); padding: 8px 14px; border-radius: 6px; font-size: 0.8rem; margin: 4px; display: inline-block; border: 2px solid #CBD5E1; font-weight: 800; cursor: pointer; }
         .draw-btn.active { background: var(--accent-blue); color: #FFFFFF; border-color: var(--accent-blue); }
 
-        input[type="text"] { background: #FFFFFF; border: 2px solid #CBD5E1; padding: 14px 18px; color: var(--text-main); border-radius: 30px; width: 100%; max-width: 340px; font-family: inherit; font-size: 1rem; font-weight: 700; }
-        input[type="text"]:focus { border-color: var(--accent-blue); outline: none; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15); }
+        input[type="text"] { background: rgba(255, 255, 255, 0.05); border: 2px solid rgba(255, 255, 255, 0.1); padding: 14px 22px; color: #FFFFFF; border-radius: 30px; width: 100%; max-width: 340px; font-family: inherit; font-size: 1rem; font-weight: 700; transition: all 0.2s ease; }
+        input[type="text"]:focus { border-color: var(--accent-blue); outline: none; background: rgba(255, 255, 255, 0.1); }
         
-        /* Premium Light Theme Leaderboard Container */
-        .leaderboard-container-box { background: #FFFFFF; border-radius: 16px; border: 2px solid var(--border-light); overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
+        /* Leaderboard styling */
+        .leaderboard-container-box { background: var(--card-base); border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
         .leaderboard-table { width: 100%; border-collapse: collapse; text-align: left; }
-        .leaderboard-table th, .leaderboard-table td { padding: 18px 24px; border-bottom: 1px solid var(--border-light); }
+        .leaderboard-table th, .leaderboard-table td { padding: 20px 24px; border-bottom: 1px solid var(--border-light); }
         .leaderboard-table th { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 900; background: #F8FAFC; }
         .leaderboard-table tr:last-child td { border-bottom: none; }
         .leaderboard-table tr:hover td { background: #F8FAFC; }
         
-        .podium-badge { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; font-weight: 900; font-family: 'Montserrat', sans-serif; font-size: 0.85rem; }
+        .podium-badge { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; font-weight: 900; font-family: 'Montserrat', sans-serif; }
         .podium-1 { background: #FEF3C7; color: #D97706; border: 1px solid #FDE68A; }
         .podium-2 { background: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; }
         .podium-3 { background: #FFEDD5; color: #C2410C; border: 1px solid #FDBA74; }
-
-        .winner-flag-tag { background: #FEF3C7; color: #B45309; padding: 2px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 800; margin-left: auto; border: 1px solid #FDE68A; text-transform: uppercase; letter-spacing: 0.5px; }
+        .winner-flag-tag { background: #FEF3C7; color: #B45309; padding: 2px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 800; margin-left: auto; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -160,13 +188,14 @@
     </div>
 
     <div id="dashboard" class="container">
+        <h1 class="page-title">FIFA WORLD CUP 2026</h1>
         <div class="bracket-wrapper" id="bracket-canvas"></div>
         <h2 class="admin-section-title">🏆 Match Control Centre</h2>
         <div class="standard-grid" id="admin-grid"></div>
     </div>
 
     <div id="predict" class="container" style="display:none">
-        <h2 style="font-family:'Montserrat'; font-weight:900;">Lock In Predictions</h2>
+        <h2 style="font-family:'Montserrat'; font-weight:900; margin-bottom:1.5rem;">Lock In Predictions</h2>
         <div style="margin-bottom: 2.5rem;">
             <input type="text" id="player-name" placeholder="Enter Tracker Name (Case-Sensitive)" oninput="loadUserPredictions()">
         </div>
@@ -446,7 +475,9 @@
             }
         }
 
+        /* Fixed Cascading Clearing Bugs */
         async function resetMatch(id) {
+            // First, reset the root targeted match node
             await db.from('matches').update({
                 home_score: null, 
                 away_score: null, 
@@ -455,6 +486,7 @@
                 winner_team: null
             }).eq('id', id);
 
+            // Traverse and wipe all dependent sequential nodes downstream
             let currentId = id;
             while (CASCADE_MAP[currentId]) {
                 const { nextMatchId, slot } = CASCADE_MAP[currentId];
@@ -515,6 +547,7 @@
             await loadUserPredictions();
         }
 
+        /* Independent Global Scope Leaderboard Display */
         async function calculateLeaderboard() {
             const { data: preds } = await db.from('predictions').select('*');
             if(!preds) return;
