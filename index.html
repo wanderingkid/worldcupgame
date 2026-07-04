@@ -16,16 +16,22 @@
             --text-main: #0F172A; 
             --text-muted: #64748B;
             --accent-blue: #2563EB;
-            --danger-pastel: #FEE2E2;
-            --danger-text: #DC2626;
             --winner-bg: #DCFCE7;
             --winner-text: #166534;
             
-            /* Premium Pastel Round Gradients */
-            --r16-gradient: linear-gradient(90deg, #E0F2FE 0%, #BAE6FD 100%); /* Pastel Soft Blue */
-            --qf-gradient: linear-gradient(90deg, #F3E8FF 0%, #E9D5FF 100%);  /* Pastel Soft Purple */
-            --sf-gradient: linear-gradient(90deg, #FEF3C7 0%, #FDE68A 100%);  /* Pastel Soft Amber */
-            --fn-gradient: linear-gradient(90deg, #D1FAE5 0%, #A7F3D0 100%);  /* Pastel Soft Emerald */
+            /* Enhanced Darker Headers with Complementary Deep Pastel Accents */
+            --r16-header: #0284C7; /* Stronger Sky Blue */
+            --qf-header: #7C3AED;  /* Stronger Violet */
+            --sf-header: #D97706;  /* Stronger Amber */
+            --fn-header: #059669;  /* Stronger Emerald */
+            
+            /* High-Contrast Notice Colors */
+            --lock-bg: #F1F5F9;
+            --lock-text: #334155;
+            --lock-border: #CBD5E1;
+            --awarded-bg: #D1FAE5;
+            --awarded-text: #065F46;
+            --awarded-border: #A7F3D0;
         }
 
         body { 
@@ -75,13 +81,13 @@
         /* Premium White Base Cards */
         .match-card { background: var(--card-base); border-radius: 16px; border: 2px solid var(--border-light); box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05); overflow: hidden; transition: border-color 0.2s ease; }
         
-        /* Round Color Assignments */
-        .round-r16 .match-id-badge { background: var(--r16-gradient); color: #0369A1; }
-        .round-qf .match-id-badge { background: var(--qf-gradient); color: #6B21A8; }
-        .round-sf .match-id-badge { background: var(--sf-gradient); color: #92400E; }
-        .round-fn .match-id-badge { background: var(--fn-gradient); color: #065F46; }
+        /* Darker Header Variants */
+        .round-r16 .match-id-badge { background: var(--r16-header); color: #FFFFFF; }
+        .round-qf .match-id-badge { background: var(--qf-header); color: #FFFFFF; }
+        .round-sf .match-id-badge { background: var(--sf-header); color: #FFFFFF; }
+        .round-fn .match-id-badge { background: var(--fn-header); color: #FFFFFF; }
 
-        .match-id-badge { font-family: 'Montserrat', sans-serif; font-size: 0.75rem; padding: 12px 16px; border-bottom: 2px solid var(--border-light); font-weight: 900; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; }
+        .match-id-badge { font-family: 'Montserrat', sans-serif; font-size: 0.75rem; padding: 14px 16px; font-weight: 900; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; }
 
         .team-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; font-weight: 700; border-bottom: 1px solid var(--border-light); color: var(--text-main); }
         .team-row:last-child { border-bottom: none; }
@@ -98,13 +104,15 @@
         .standard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem; margin-top: 1.5rem; }
         
         /* Functional Forms */
-        .form-card { background: var(--card-base); border: 2px solid var(--border-light); border-radius: 16px; overflow: hidden; position: relative; transition: all 0.3s ease; box-shadow: 0 8px 20px rgba(0,0,0,0.02); }
+        .form-card { background: var(--card-base); border: 2px solid var(--border-light); border-radius: 16px; overflow: hidden; position: relative; transition: all 0.2s ease; box-shadow: 0 8px 20px rgba(0,0,0,0.02); }
         .form-card-body { padding: 1.5rem; }
-        .form-card.locked { opacity: 0.8; background: #F8FAFC; }
-        .form-card.saved-state { border-color: #10B981; box-shadow: 0 0 15px rgba(16, 185, 129, 0.15); }
+        .form-card.locked { opacity: 0.9; background: #FAFAFA; }
 
-        .match-locked-overlay { background: var(--danger-pastel); border-bottom: 2px solid rgba(220, 38, 38, 0.2); padding: 12px; text-align: center; font-size: 0.8rem; color: var(--danger-text); font-weight: 800; letter-spacing: 0.5px; }
-        .match-locked-overlay.awarded { background: var(--winner-bg); border-bottom-color: #10B981; color: var(--winner-text); }
+        /* Highly Visible Status Ribbons */
+        .status-ribbon { padding: 10px; text-align: center; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.5px; border-bottom: 2px solid transparent; }
+        .status-ribbon.updated { background: var(--winner-bg); color: var(--winner-text); border-bottom-color: rgba(22, 101, 52, 0.15); }
+        .status-ribbon.locked-banner { background: var(--lock-bg); color: var(--lock-text); border-bottom-color: var(--lock-border); }
+        .status-ribbon.awarded-banner { background: var(--awarded-bg); color: var(--awarded-text); border-bottom-color: var(--awarded-border); }
 
         .input-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; color: var(--text-main); font-weight: 700; }
         .score-input { width: 52px; padding: 8px 4px; border: 2px solid #CBD5E1; border-radius: 8px; text-align: center; background: #FFFFFF; color: var(--text-main); font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.1rem; }
@@ -114,8 +122,8 @@
         button { padding: 12px 14px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; font-family: 'Montserrat', sans-serif; font-size: 0.85rem; transition: all 0.2s ease; margin-top: 8px; width: 100%; letter-spacing: 0.5px; text-transform: uppercase; }
         .btn-primary { background: var(--border-dark); color: white; }
         .btn-primary:hover:not(:disabled) { background: #1E293B; }
-        .btn-danger { background: transparent; color: var(--danger-text); border: 2px solid rgba(220, 38, 38, 0.2); margin-top: 10px; }
-        .btn-danger:hover { background: var(--danger-pastel); }
+        .btn-danger { background: transparent; color: #DC2626; border: 2px solid rgba(220, 38, 38, 0.2); margin-top: 10px; }
+        .btn-danger:hover { background: #FEE2E2; }
         
         .lock-indicator { display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--accent-blue); font-weight: 800; font-size: 0.85rem; background: rgba(37, 99, 235, 0.08); padding: 12px; border-radius: 8px; cursor: pointer; margin-top: 8px; border: 2px solid rgba(37, 99, 235, 0.15); }
         .lock-indicator:hover { background: rgba(37, 99, 235, 0.15); }
@@ -180,6 +188,16 @@
         let userPredictions = [];
         let internalDrawWinners = {}; 
         let unlockedPredictions = {}; 
+
+        const CASCADE_MAP = {
+            1: { nextMatchId: 9, slot: 'home' },  2: { nextMatchId: 9, slot: 'away' },
+            3: { nextMatchId: 10, slot: 'home' }, 4: { nextMatchId: 10, slot: 'away' },
+            5: { nextMatchId: 11, slot: 'home' }, 6: { nextMatchId: 11, slot: 'away' },
+            7: { nextMatchId: 12, slot: 'home' }, 8: { nextMatchId: 12, slot: 'away' },
+            9: { nextMatchId: 13, slot: 'home' }, 10: { nextMatchId: 13, slot: 'away' },
+            11: { nextMatchId: 14, slot: 'home' }, 12: { nextMatchId: 14, slot: 'away' },
+            13: { nextMatchId: 15, slot: 'home' }, 14: { nextMatchId: 15, slot: 'away' }
+        };
 
         function showTab(id, el) {
             document.getElementById('dashboard').style.display = (id === 'dashboard') ? 'block' : 'none';
@@ -284,10 +302,12 @@
                 const hVal = m.home_score ?? '';
                 const aVal = m.away_score ?? '';
                 const roundClass = getRoundClass(m.id);
+                const isUpdated = m.home_score !== null;
 
                 return `
-                    <div class="form-card ${roundClass} ${m.home_score !== null ? 'saved-state' : ''}">
+                    <div class="form-card ${roundClass}">
                         <div class="match-id-badge"><span>MATCH ID: ${m.id}</span><span>${m.round_name}</span></div>
+                        ${isUpdated ? `<div class="status-ribbon updated">✓ Result Updated</div>` : ''}
                         <div class="form-card-body">
                             <div class="input-row">
                                 <span class="team-name">${m.home_team || 'TBD'}</span>
@@ -320,10 +340,12 @@
                 if (isMatchStarted) {
                     const pts = calculateMatchPoints(m, existing);
                     if (pts !== null) {
-                        lockBannerHTML = `<div class="match-locked-overlay awarded">🏆 MATCH LOCKED (+${pts} PTS AWARDED)</div>`;
+                        lockBannerHTML = `<div class="status-ribbon awarded-banner">🏆 MATCH LOCKED (+${pts} PTS AWARDED)</div>`;
                     } else {
-                        lockBannerHTML = '<div class="match-locked-overlay">⚠️ MATCH LOCKED: RESULT COMMITTED</div>';
+                        lockBannerHTML = '<div class="status-ribbon locked-banner">🔒 MATCH LOCKED: RESULT COMMITTED</div>';
                     }
+                } else if (existing && !unlockedPredictions[m.id]) {
+                    lockBannerHTML = '<div class="status-ribbon locked-banner">🔒 PREDICTION LOCKED</div>';
                 }
 
                 let predictDrawHTML = '';
@@ -345,7 +367,7 @@
                 const showAwayFlag = existing?.pred_winner === m.away_team && m.away_team;
 
                 return `
-                    <div class="form-card ${roundClass} ${isLocked ? 'locked' : ''} ${existing && !isLocked ? 'saved-state' : ''}">
+                    <div class="form-card ${roundClass} ${isLocked ? 'locked' : ''}">
                         <div class="match-id-badge"><span>MATCH ${m.id}</span><span>${m.round_name}</span></div>
                         ${lockBannerHTML}
                         
@@ -366,7 +388,7 @@
                             </div>
                             ${predictDrawHTML}
                             ${isLocked ? (isMatchStarted ? '' : `
-                                <div class="lock-indicator" onclick="unlockedPredictions[${m.id}]=true; renderUI();">🔒 Change Prediction</div>
+                                <div class="lock-indicator" onclick="unlockedPredictions[${m.id}]=true; renderUI();">🔓 Change Prediction</div>
                             `) : `
                                 <button class="btn-primary" onclick="savePrediction(${m.id})">Lock Prediction</button>
                             `}
@@ -416,17 +438,8 @@
         }
 
         async function advanceNextRoundSlot(sourceId, winnerName) {
-            const cascadeMap = {
-                1: [9, 'home'],  2: [9, 'away'],
-                3: [10, 'home'], 4: [10, 'away'],
-                5: [11, 'home'], 6: [11, 'away'],
-                7: [12, 'home'], 8: [12, 'away'],
-                9: [13, 'home'], 10: [13, 'away'],
-                11: [14, 'home'], 12: [14, 'away'],
-                13: [15, 'home'], 14: [15, 'away']
-            };
-            if (cascadeMap[sourceId]) {
-                const [nextMatchId, slot] = cascadeMap[sourceId];
+            if (CASCADE_MAP[sourceId]) {
+                const { nextMatchId, slot } = CASCADE_MAP[sourceId];
                 const updatePayload = {};
                 updatePayload[`${slot}_team`] = winnerName;
                 await db.from('matches').update(updatePayload).eq('id', nextMatchId);
@@ -434,25 +447,24 @@
         }
 
         async function resetMatch(id) {
-            await db.from('matches').update({home_score:null, away_score:null, home_pen:null, away_pen:null, winner_team:null}).eq('id', id);
-
-            const cascadeMap = {
-                1: [9, 'home'],  2: [9, 'away'],
-                3: [10, 'home'], 4: [10, 'away'],
-                5: [11, 'home'], 6: [11, 'away'],
-                7: [12, 'home'], 8: [12, 'away'],
-                9: [13, 'home'], 10: [13, 'away'],
-                11: [14, 'home'], 12: [14, 'away'],
-                13: [15, 'home'], 14: [15, 'away']
-            };
+            await db.from('matches').update({
+                home_score: null, 
+                away_score: null, 
+                home_pen: null, 
+                away_pen: null, 
+                winner_team: null
+            }).eq('id', id);
 
             let currentId = id;
-            while (cascadeMap[currentId]) {
-                const [nextMatchId, slot] = cascadeMap[currentId];
+            while (CASCADE_MAP[currentId]) {
+                const { nextMatchId, slot } = CASCADE_MAP[currentId];
+                
                 const updatePayload = {};
-                updatePayload[`${slot}_team`] = null;
-                updatePayload['home_score'] = null;
+                updatePayload[`${slot}_team`] = null; 
+                updatePayload['home_score'] = null;   
                 updatePayload['away_score'] = null;
+                updatePayload['home_pen'] = null;
+                updatePayload['away_pen'] = null;
                 updatePayload['winner_team'] = null;
 
                 await db.from('matches').update(updatePayload).eq('id', nextMatchId);
