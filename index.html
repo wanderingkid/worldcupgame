@@ -173,15 +173,12 @@
 
     <script>
         // ==========================================
-        // 1. SUPABASE INITIALIZATION (Safe-Guarded)
+        // 1. SUPABASE INITIALIZATION
         // ==========================================
         const CONFIG_URL = 'https://yvkbmelrvdfdjlbanciv.supabase.co'; 
         const CONFIG_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2a2JtZWxydmRmZGpsYmFuY2l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxNjM1ODksImV4cCI6MjA5ODczOTU4OX0.BP6DzEGRInduT3bueKlJRoJNGP9I4Pwk7HKxiBGF4A0';
         
-        // Explicitly reference the window context to stop the SyntaxError crash
         const clientInstance = window.supabase.createClient(CONFIG_URL, CONFIG_KEY);
-
-        // Global data state
         let allMatches = [];
 
         // ==========================================
@@ -218,11 +215,6 @@
                 
                 if (error) throw error;
                 allMatches = data || [];
-
-                if (allMatches.length === 0) {
-                    showStatus('Database connected, but no match rows found.', true);
-                    return;
-                }
 
                 renderDashboard();
                 renderAdminPanel();
@@ -295,10 +287,10 @@
         // 4. ADMIN WRITE ACTIONS
         // ==========================================
         async function saveMatchResult(id) {
-            const homeScore = document.getElementById(`admin-h-${id}`).value;
-            const awayScore = document.getElementById(`admin-a-${id}`).value;
+            const homeInput = document.getElementById(`admin-h-${id}`).value;
+            const awayInput = document.getElementById(`admin-a-${id}`).value;
 
-            if (homeScore === '' || awayScore === '') {
+            if (homeInput === '' || awayInput === '') {
                 alert('Please enter scores for both teams.');
                 return;
             }
@@ -306,22 +298,20 @@
             const { error } = await clientInstance
                 .from('matches')
                 .update({ 
-                    home_score: parseInt(homeScore, 10), 
-                    away_score: parseInt(awayScore, 10) 
+                    home_score: parseInt(homeInput, 10), 
+                    away_score: parseInt(awayInput, 10) 
                 })
                 .eq('id', id);
 
             if (error) {
                 alert(`Error saving result: ${error.message}`);
             } else {
-                showStatus(`Match ${id} updated. Next round populated automatically!`);
-                initializeApp(); 
+                showStatus(`Match ${id} saved successfully!`);
+                await initializeApp(); 
             }
         }
 
         async function resetMatchResult(id) {
-            if (!confirm("Are you sure you want to reset this match? This clears scores and undoes subsequent advancement.")) return;
-
             const { error } = await clientInstance
                 .from('matches')
                 .update({ 
@@ -333,8 +323,11 @@
             if (error) {
                 alert(`Error during reset: ${error.message}`);
             } else {
-                showStatus(`Match ${id} scores cleared and bracket dependencies updated.`);
-                initializeApp();
+                // Instantly wipe forms clear visually
+                document.getElementById(`admin-h-${id}`).value = '';
+                document.getElementById(`admin-a-${id}`).value = '';
+                showStatus(`Match ${id} scores cleared.`);
+                await initializeApp();
             }
         }
 
@@ -395,7 +388,6 @@
 
                 if (!scores[p.player_name]) scores[p.player_name] = 0;
 
-                // Simple scoring logic: 3 points for correct winner match outcome
                 const actualWinner = actual.home_score > actual.away_score ? actual.home_team : (actual.away_score > actual.home_score ? actual.away_team : null);
                 if (p.pred_winner === actualWinner && actualWinner !== null) {
                     scores[p.player_name] += 3;
@@ -435,7 +427,6 @@
             `;
         }
 
-        // Run setup on window load
         window.addEventListener('DOMContentLoaded', initializeApp);
     </script>
 </body>
