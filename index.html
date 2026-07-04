@@ -1,42 +1,202 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournament 2026</title>
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        body { font-family: 'Inter', sans-serif; background: #F1F5F9; }
-        .container { max-width: 800px; margin: 2rem auto; padding: 1rem; }
-        .error { color: red; font-weight: bold; background: #fee; padding: 10px; border: 1px solid red; }
+        :root { 
+            --bg: #F8FAFC; 
+            --card: #FFFFFF; 
+            --primary: #0F172A; 
+            --border: #E2E8F0;
+            --text-muted: #64748B;
+        }
+        
+        body { 
+            font-family: 'Inter', system-ui, sans-serif; 
+            background: var(--bg); 
+            color: var(--primary); 
+            margin: 0; 
+        }
+        
+        .nav { 
+            background: var(--card); 
+            padding: 1.5rem; 
+            display: flex; 
+            justify-content: center; 
+            gap: 30px; 
+            border-bottom: 1px solid var(--border); 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .tab { 
+            cursor: pointer; 
+            font-weight: 600; 
+            color: var(--text-muted); 
+            transition: color 0.2s;
+        }
+        
+        .tab:hover, .tab.active { 
+            color: var(--primary); 
+        }
+        
+        .container { 
+            max-width: 1000px; 
+            margin: 2rem auto; 
+            padding: 0 1rem; 
+        }
+        
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 1.25rem; 
+        }
+        
+        .card { 
+            background: var(--card); 
+            border-radius: 12px; 
+            padding: 1.5rem; 
+            border: 1px solid var(--border); 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02); 
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .card small {
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+
+        .card h3 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .card p {
+            margin: 0;
+            font-weight: 600;
+            color: #334155;
+        }
+        
+        #status-bar {
+            text-align: center;
+            padding: 10px;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .error { color: #DC2626; background: #FEE2E2; border-radius: 8px; }
+        .success { color: #16A34A; background: #DCFCE7; border-radius: 8px; }
     </style>
 </head>
 <body>
-    <div id="status" class="container"></div> <div id="bracket-grid" class="container"></div>
+    <div class="nav">
+        <div class="tab active" onclick="showTab('dashboard', this)">🏆 Bracket</div>
+        <div class="tab" onclick="showTab('predict', this)">✍️ Predictions</div>
+        <div class="tab" onclick="showTab('leaderboard', this)">📈 Leaderboard</div>
+    </div>
+
+    <div class="container">
+        <div id="status-bar" style="display:none;"></div>
+    </div>
+
+    <div id="dashboard" class="container">
+        <div class="grid" id="bracket-grid">
+            </div>
+    </div>
+
+    <div id="predict" class="container" style="display:none">
+        <h2>Your Predictions</h2>
+        <div class="card"><p>Prediction interface coming next...</p></div>
+    </div>
+
+    <div id="leaderboard" class="container" style="display:none">
+        <h2>Leaderboard</h2>
+        <div class="card"><p>Standings will appear here...</p></div>
+    </div>
 
     <script>
-    // Initialize Supabase ONLY ONCE
-    const supabase = supabase.createClient('https://yvkbmelrvdfdjlbanciv.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2a2JtZWxydmRmZGpsYmFuY2l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxNjM1ODksImV4cCI6MjA5ODczOTU4OX0.BP6DzEGRInduT3bueKlJRoJNGP9I4Pwk7HKxiBGF4A0');
+        // ==========================================
+        // 1. SUPABASE INITIALIZATION (Declared ONLY ONCE)
+        // ==========================================
+        // REPLACE THESE TWO STRINGS WITH YOUR ACTUAL KEYS. KEEP THE QUOTES.
+        const SUPABASE_URL = 'https://yvkbmelrvdfdjlbanciv.supabase.co'; 
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2a2JtZWxydmRmZGpsYmFuY2l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxNjM1ODksImV4cCI6MjA5ODczOTU4OX0.BP6DzEGRInduT3bueKlJRoJNGP9I4Pwk7HKxiBGF4A0';
+        
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    async function loadData() {
-        try {
-            const { data, error } = await supabase.from('matches').select('*').order('id');
-            if (error) throw error;
+        // ==========================================
+        // 2. UI NAVIGATION LOGIC
+        // ==========================================
+        function showTab(tabId, element) {
+            // Hide all containers
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('predict').style.display = 'none';
+            document.getElementById('leaderboard').style.display = 'none';
             
-            const grid = document.getElementById('bracket-grid');
-            if (grid) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            
+            // Show selected container and highlight tab
+            document.getElementById(tabId).style.display = 'block';
+            element.classList.add('active');
+        }
+
+        function showStatus(message, isError = false) {
+            const statusBar = document.getElementById('status-bar');
+            statusBar.style.display = 'block';
+            statusBar.className = isError ? 'error' : 'success';
+            statusBar.textContent = message;
+        }
+
+        // ==========================================
+        // 3. DATA FETCHING LOGIC
+        // ==========================================
+        async function loadMatches() {
+            try {
+                // Fetch all rows from the 'matches' table
+                const { data, error } = await supabase
+                    .from('matches')
+                    .select('*')
+                    .order('id');
+                
+                // If Supabase throws an error, catch it
+                if (error) throw error;
+                
+                // If connection works but table is empty
+                if (!data || data.length === 0) {
+                    showStatus('Connected successfully, but the matches table is empty.', true);
+                    return;
+                }
+
+                // Map data to HTML cards
+                const grid = document.getElementById('bracket-grid');
                 grid.innerHTML = data.map(m => `
                     <div class="card">
-                        <small>${m.round_name}</small>
+                        <small>Match ID ${m.id} • ${m.round_name}</small>
                         <h3>${m.home_team || 'TBD'} vs ${m.away_team || 'TBD'}</h3>
                         <p>Result: ${m.home_score ?? '-'} - ${m.away_score ?? '-'}</p>
                     </div>
                 `).join('');
-            }
-        } catch (e) {
-            console.error("Data Load Error:", e);
-        }
-    }
 
-    // Run it
-    loadData();
-</script>
+            } catch (err) {
+                // Display the exact error on the screen so we don't have to guess
+                console.error(err);
+                showStatus(`Connection Error: ${err.message}`, true);
+            }
+        }
+
+        // Initialize the app
+        loadMatches();
+    </script>
 </body>
 </html>
