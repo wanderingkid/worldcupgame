@@ -254,12 +254,12 @@
     <div id="dashboard" class="container">
         <div class="bracket-wrapper" id="bracket-canvas"></div>
 
-        <h2 class="admin-section-title">⚙️ Score Update</h2>
+        <h2 class="admin-section-title">⚙️ Commissioner Tools</h2>
         <div class="standard-grid" id="admin-grid"></div>
     </div>
 
     <div id="predict" class="container" style="display:none">
-        <h2>✍         <h2>✍️ Submit Predictions</h2>
+        <h2>✍️ Submit Predictions</h2>
         <div style="margin-bottom: 2rem;">
             <input type="text" id="player-name" placeholder="Enter Player Name">
         </div>
@@ -276,8 +276,7 @@
         // CONFIGURATION VARIABLES - INSERT SUPABASE KEYS
         // ==========================================
         const CONFIG_URL = 'https://yvkbmelrvdfdjlbanciv.supabase.co'; 
-        const CONFIG_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2a2JtZWxydmRmZGpsYmFuY2l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxNjM1ODksImV4cCI6MjA5ODczOTU4OX0.BP6DzEGRInduT3bueKlJRoJNGP9I4Pwk7HKxiBGF4A0
-'; 
+        const CONFIG_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2a2JtZWxydmRmZGpsYmFuY2l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxNjM1ODksImV4cCI6MjA5ODczOTU4OX0.BP6DzEGRInduT3bueKlJRoJNGP9I4Pwk7HKxiBGF4A0'; 
         
         const db = window.supabase.createClient(CONFIG_URL, CONFIG_KEY);
         let allMatches = [];
