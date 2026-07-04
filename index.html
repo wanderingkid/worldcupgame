@@ -99,6 +99,7 @@
     </style>
 </head>
 <body>
+
     <div class="nav">
         <div class="tab active" onclick="showTab('dashboard', this)">🏆 Bracket</div>
         <div class="tab" onclick="showTab('predict', this)">✍️ Predictions</div>
@@ -126,13 +127,13 @@
 
     <script>
         // ==========================================
-        // 1. SUPABASE INITIALIZATION (Declared ONLY ONCE)
+        // 1. SUPABASE INITIALIZATION
         // ==========================================
-        // REPLACE THESE TWO STRINGS WITH YOUR ACTUAL KEYS. KEEP THE QUOTES.
+        // Variable changed to 'db' to prevent naming collisions with the CDN library
         const SUPABASE_URL = 'https://yvkbmelrvdfdjlbanciv.supabase.co'; 
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2a2JtZWxydmRmZGpsYmFuY2l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxNjM1ODksImV4cCI6MjA5ODczOTU4OX0.BP6DzEGRInduT3bueKlJRoJNGP9I4Pwk7HKxiBGF4A0';
         
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         // ==========================================
         // 2. UI NAVIGATION LOGIC
@@ -148,7 +149,9 @@
             
             // Show selected container and highlight tab
             document.getElementById(tabId).style.display = 'block';
-            element.classList.add('active');
+            if (element) {
+                element.classList.add('active');
+            }
         }
 
         function showStatus(message, isError = false) {
@@ -163,16 +166,14 @@
         // ==========================================
         async function loadMatches() {
             try {
-                // Fetch all rows from the 'matches' table
-                const { data, error } = await supabase
+                // Fetch all rows from the 'matches' table using our clean 'db' instance
+                const { data, error } = await db
                     .from('matches')
                     .select('*')
                     .order('id');
                 
-                // If Supabase throws an error, catch it
                 if (error) throw error;
                 
-                // If connection works but table is empty
                 if (!data || data.length === 0) {
                     showStatus('Connected successfully, but the matches table is empty.', true);
                     return;
@@ -189,13 +190,12 @@
                 `).join('');
 
             } catch (err) {
-                // Display the exact error on the screen so we don't have to guess
                 console.error(err);
                 showStatus(`Connection Error: ${err.message}`, true);
             }
         }
 
-        // Initialize the app
+        // Initialize the app on load
         loadMatches();
     </script>
 </body>
