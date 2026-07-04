@@ -9,48 +9,49 @@
     
     <style>
         :root { 
-            --bg: #F8FAFC; 
+            --bg: #F1F5F9; 
             --bg-gradient: linear-gradient(135deg, #F8FAFC 0%, #E2E8F0 100%);
-            --card: #FFFFFF; 
-            --border: #E2E8F0;
+            --card-dark: #1E293B; 
+            --card-header: linear-gradient(90deg, #0F172A 0%, #1E293B 100%);
+            --border: #334155;
             --border-active: #2563EB;
-            --text-main: #0F172A; 
-            --text-muted: #64748B;
-            --accent: #2563EB; 
-            --accent-glow: rgba(37, 99, 235, 0.15);
-            --danger: #DC2626; 
-            --winner-bg: rgba(16, 185, 129, 0.08);
-            --winner-text: #059669;
-            --warning: #D97706;
+            --text-light: #F8FAFC; 
+            --text-muted: #94A3B8;
+            --accent: #3B82F6; 
+            --accent-glow: rgba(59, 130, 246, 0.25);
+            --danger: #EF4444; 
+            --winner-bg: rgba(16, 185, 129, 0.15);
+            --winner-text: #34D399;
+            --warning: #F59E0B;
         }
 
         body { 
             font-family: 'Space Grotesk', system-ui, sans-serif; 
             background: var(--bg-gradient);
-            color: var(--text-main); 
+            color: #0F172A; 
             margin: 0; 
             min-height: 100vh;
         }
 
         .nav { 
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(12px);
             padding: 1.25rem; 
             display: flex; 
             justify-content: center; 
             gap: 40px; 
-            border-bottom: 1px solid var(--border);
+            border-bottom: 2px solid #CBD5E1;
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
         }
         
         .tab { 
             cursor: pointer; 
             font-weight: 700; 
             font-family: 'Montserrat', sans-serif;
-            color: var(--text-muted); 
+            color: #64748B; 
             transition: all 0.2s ease;
             font-size: 0.95rem;
             letter-spacing: 0.5px;
@@ -58,69 +59,72 @@
             padding: 4px 8px;
         }
         
-        .tab:hover { color: var(--text-main); }
-        .tab.active { color: var(--accent); }
+        .tab:hover { color: #0F172A; }
+        .tab.active { color: var(--border-active); }
         .tab.active::after {
-            content: ''; position: absolute; bottom: -21px; left: 0; width: 100%; height: 3px; background: var(--accent); box-shadow: 0 -1px 6px var(--accent-glow);
+            content: ''; position: absolute; bottom: -21px; left: 0; width: 100%; height: 4px; background: var(--border-active); box-shadow: 0 -1px 10px rgba(37, 99, 235, 0.5);
         }
 
         .container { max-width: 1400px; margin: 2.5rem auto; padding: 0 1.5rem; }
 
         .bracket-wrapper { display: flex; gap: 2.5rem; overflow-x: auto; padding: 1rem 0; align-items: center; justify-content: flex-start; }
         .bracket-column { display: flex; flex-direction: column; gap: 2rem; min-width: 280px; flex: 1; }
-        .column-header { font-family: 'Montserrat', sans-serif; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); text-align: center; margin-bottom: 0.5rem; }
+        .column-header { font-family: 'Montserrat', sans-serif; font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: #475569; text-align: center; margin-bottom: 0.5rem; }
 
-        .match-card { background: var(--card); border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04); overflow: hidden; }
-        .match-id-badge { font-size: 0.7rem; color: var(--text-muted); padding: 6px 12px; background: #F1F5F9; border-bottom: 1px solid var(--border); font-weight: bold; letter-spacing: 0.5px; }
+        /* Ultra-Contrast Dark Card Strategy */
+        .match-card { background: var(--card-dark); border-radius: 12px; border: 2px solid var(--border); box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.3); overflow: hidden; }
+        .match-id-badge { font-family: 'Montserrat', sans-serif; font-size: 0.75rem; color: #E2E8F0; padding: 10px 14px; background: var(--card-header); border-bottom: 2px solid var(--border); font-weight: 800; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; }
 
-        .team-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; font-weight: 700; border-bottom: 1px solid var(--border); color: var(--text-main); }
+        .team-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-light); }
         .team-row:last-child { border-bottom: none; }
         .team-row.tbd { color: var(--text-muted); font-weight: 500; }
         .team-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
         
-        .score-display { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; display: inline-flex; align-items: center; gap: 6px; color: var(--text-main); }
-        .penalty-badge { font-size: 0.75rem; color: var(--winner-text); background: rgba(16, 185, 129, 0.15); padding: 2px 6px; border-radius: 4px; font-weight: 800; }
+        .score-display { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; display: inline-flex; align-items: center; gap: 6px; color: #FFFFFF; }
+        .penalty-badge { font-size: 0.75rem; color: #A7F3D0; background: rgba(16, 185, 129, 0.25); padding: 2px 6px; border-radius: 4px; font-weight: 800; border: 1px solid rgba(16, 185, 129, 0.4); }
         .team-row.winner { background: var(--winner-bg); color: var(--winner-text); }
         .team-row.winner .score-display { color: var(--winner-text); }
 
-        .admin-section-title { font-family: 'Montserrat', sans-serif; margin-top: 5rem; border-top: 2px solid var(--border); padding-top: 3rem; font-size: 1.5rem; color: var(--text-main); }
-        .standard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 1.5rem; }
+        .admin-section-title { font-family: 'Montserrat', sans-serif; margin-top: 5rem; border-top: 3px solid #CBD5E1; padding-top: 3rem; font-size: 1.75rem; color: #0F172A; }
+        .standard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem; }
         
-        .form-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; position: relative; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03); }
-        .form-card.locked { background: #F8FAFC; border-color: var(--border); }
-        .form-card.saved-state { border-color: #A7F3D0; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.05); }
+        /* Interactive Input Cards */
+        .form-card { background: var(--card-dark); border: 2px solid var(--border); border-radius: 12px; overflow: hidden; position: relative; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.25); }
+        .form-card-body { padding: 1.5rem; }
+        .form-card.locked { opacity: 0.85; background: #0F172A; border-color: #334155; }
+        .form-card.saved-state { border-color: #10B981; box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
 
-        .match-locked-overlay { background: rgba(220, 38, 38, 0.06); border: 1px solid rgba(220, 38, 38, 0.2); padding: 10px; border-radius: 8px; text-align: center; font-size: 0.75rem; color: var(--danger); font-weight: bold; margin-bottom: 14px; letter-spacing: 0.5px; }
-        .match-locked-overlay.awarded { background: var(--winner-bg); border-color: rgba(16, 185, 129, 0.3); color: var(--winner-text); }
+        .match-locked-overlay { background: rgba(239, 68, 68, 0.15); border-bottom: 2px solid rgba(239, 68, 68, 0.4); padding: 10px; text-align: center; font-size: 0.75rem; color: #FCA5A5; font-weight: bold; letter-spacing: 0.5px; }
+        .match-locked-overlay.awarded { background: rgba(16, 185, 129, 0.2); border-bottom-color: #10B981; color: #A7F3D0; }
 
-        .input-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .score-input { width: 48px; padding: 8px 4px; border: 1px solid #CBD5E1; border-radius: 6px; text-align: center; background: #FFFFFF; color: var(--text-main); font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 1rem; }
-        .score-input:focus { border-color: var(--accent); outline: none; }
-        .score-input:disabled { background: #E2E8F0; color: var(--text-muted); cursor: not-allowed; border-color: #CBD5E1; }
+        .input-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; color: var(--text-light); font-weight: 700; }
+        .score-input { width: 52px; padding: 8px 4px; border: 2px solid #475569; border-radius: 6px; text-align: center; background: #0F172A; color: #FFFFFF; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 1.05rem; }
+        .score-input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 8px var(--accent-glow); }
+        .score-input:disabled { background: #1E293B; color: #64748B; cursor: not-allowed; border-color: #334155; }
 
-        button { padding: 10px 14px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; font-family: 'Montserrat', sans-serif; font-size: 0.8rem; transition: all 0.2s ease; margin-top: 8px; width: 100%; }
-        .btn-primary { background: var(--accent); color: white; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2); }
-        .btn-primary:hover:not(:disabled) { background: #1d4ed8; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3); }
-        .btn-danger { background: transparent; color: var(--danger); border: 1px solid rgba(220, 38, 38, 0.2); margin-top: 8px; }
-        .btn-danger:hover { background: rgba(220, 38, 38, 0.05); }
+        button { padding: 12px 14px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; font-family: 'Montserrat', sans-serif; font-size: 0.8rem; transition: all 0.2s ease; margin-top: 8px; width: 100%; letter-spacing: 0.5px; }
+        .btn-primary { background: var(--accent); color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+        .btn-primary:hover:not(:disabled) { background: #2563EB; box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4); }
+        .btn-danger { background: transparent; color: #F87171; border: 2px solid rgba(239, 68, 68, 0.3); margin-top: 10px; }
+        .btn-danger:hover { background: rgba(239, 68, 68, 0.1); }
         
-        .lock-indicator { display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--accent); font-weight: 700; font-size: 0.85rem; background: var(--accent-glow); padding: 8px; border-radius: 6px; cursor: pointer; margin-top: 8px; border: 1px solid rgba(37, 99, 235, 0.2); }
-        .lock-indicator:hover { background: rgba(37, 99, 235, 0.25); }
+        .lock-indicator { display: flex; align-items: center; justify-content: center; gap: 6px; color: #60A5FA; font-weight: 700; font-size: 0.85rem; background: rgba(59, 130, 246, 0.15); padding: 10px; border-radius: 6px; cursor: pointer; margin-top: 8px; border: 2px solid rgba(59, 130, 246, 0.3); }
+        .lock-indicator:hover { background: rgba(59, 130, 246, 0.25); }
         
-        .draw-select-box { background: rgba(37, 99, 235, 0.04); border: 1px dashed #93C5FD; padding: 10px; border-radius: 8px; margin-bottom: 12px; text-align: center; }
-        .draw-btn { background: #FFFFFF; color: var(--text-main); padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; margin: 4px; display: inline-block; width: auto; border: 1px solid #CBD5E1; font-weight: 600; }
-        .draw-btn.active { background: var(--accent); color: #FFFFFF; font-weight: bold; border-color: var(--accent); box-shadow: 0 2px 8px var(--accent-glow); }
+        .draw-select-box { background: rgba(59, 130, 246, 0.1); border: 2px dashed #3B82F6; padding: 12px; border-radius: 8px; margin-bottom: 14px; text-align: center; }
+        .draw-btn { background: #0F172A; color: #FFFFFF; padding: 8px 14px; border-radius: 6px; font-size: 0.75rem; margin: 4px; display: inline-block; width: auto; border: 2px solid #475569; font-weight: 700; cursor: pointer; }
+        .draw-btn.active { background: var(--accent); color: #FFFFFF; border-color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
 
-        input[type="text"] { background: #FFFFFF; border: 1px solid #CBD5E1; padding: 12px 16px; color: var(--text-main); border-radius: 8px; width: 100%; max-width: 300px; font-family: inherit; font-size: 0.95rem; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        input[type="text"]:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px var(--accent-glow); }
+        input[type="text"] { background: #FFFFFF; border: 2px solid #CBD5E1; padding: 14px 18px; color: #0F172A; border-radius: 8px; width: 100%; max-width: 320px; font-family: inherit; font-size: 1rem; font-weight: 700; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        input[type="text"]:focus { border-color: var(--border-active); outline: none; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15); }
         
-        .leaderboard-table { width: 100%; border-collapse: collapse; text-align: left; margin-top: 1rem; }
-        .leaderboard-table th, .leaderboard-table td { padding: 16px; border-bottom: 1px solid var(--border); }
-        .leaderboard-table th { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+        .leaderboard-table { width: 100%; border-collapse: collapse; text-align: left; }
+        .leaderboard-table th, .leaderboard-table td { padding: 18px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .leaderboard-table th { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; background: rgba(0,0,0,0.15); }
         .leaderboard-table tr:last-child td { border-bottom: none; }
-        .leaderboard-table tr:hover td { background: #F1F5F9; }
+        .leaderboard-table tr:hover td { background: rgba(255,255,255,0.02); }
         
-        .winner-flag-tag { background: rgba(217, 119, 6, 0.1); color: var(--warning); padding: 2px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; margin-left: auto; border: 1px solid rgba(217, 119, 6, 0.2); }
+        .winner-flag-tag { background: rgba(245, 158, 11, 0.2); color: #FBBF24; padding: 2px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 800; margin-left: auto; border: 1px solid rgba(245, 158, 11, 0.4); text-transform: uppercase; letter-spacing: 0.5px; }
     </style>
 </head>
 <body>
@@ -139,7 +143,7 @@
 
     <div id="predict" class="container" style="display:none">
         <h2>Submit Predictions</h2>
-        <div style="margin-bottom: 2rem;">
+        <div style="margin-bottom: 2.5rem;">
             <input type="text" id="player-name" placeholder="Enter Player Name (Case-Sensitive)" oninput="loadUserPredictions()">
         </div>
         <div class="standard-grid" id="predict-grid"></div>
@@ -147,7 +151,7 @@
 
     <div id="leaderboard" class="container" style="display:none">
         <h2>Leaderboard Standings</h2>
-        <div class="form-card" id="leaderboard-card"></div>
+        <div class="form-card" style="padding:0;" id="leaderboard-card"></div>
     </div>
 
     <script>
@@ -194,7 +198,7 @@
             const awayIsWinner = m.winner_team && m.winner_team === m.away_team;
             return `
                 <div class="match-card">
-                    <div class="match-id-badge">MATCH ID ${m.id}</div>
+                    <div class="match-id-badge"><span>MATCH ${m.id}</span><span style="font-size:0.65rem; opacity:0.7;">${m.round_name}</span></div>
                     <div class="team-row ${!m.home_team ? 'tbd' : ''} ${homeIsWinner ? 'winner' : ''}">
                         <span class="team-name">${m.home_team || 'TBD'}</span>
                         <span class="score-display">${m.home_score ?? '-'} ${m.home_pen !== null ? `<span class="penalty-badge">PK: ${m.home_pen}</span>` : ''}</span>
@@ -261,23 +265,25 @@
                 const aVal = m.away_score ?? '';
                 return `
                     <div class="form-card ${m.home_score !== null ? 'saved-state' : ''}">
-                        <div class="match-id-badge" style="background:transparent; padding:0 0 8px 0; margin-bottom:8px;">${m.round_name} (ID: ${m.id})</div>
-                        <div class="input-row">
-                            <span class="team-name">${m.home_team || 'TBD'}</span>
-                            <div>
-                                <input type="number" id="h-${m.id}" class="score-input" placeholder="FT" value="${hVal}">
-                                <input type="number" id="hp-${m.id}" class="score-input" style="border-color:#10B981" placeholder="PK" value="${m.home_pen ?? ''}">
+                        <div class="match-id-badge"><span>ID: ${m.id}</span><span>${m.round_name}</span></div>
+                        <div class="form-card-body">
+                            <div class="input-row">
+                                <span class="team-name">${m.home_team || 'TBD'}</span>
+                                <div>
+                                    <input type="number" id="h-${m.id}" class="score-input" placeholder="FT" value="${hVal}">
+                                    <input type="number" id="hp-${m.id}" class="score-input" style="border-color:#10B981" placeholder="PK" value="${m.home_pen ?? ''}">
+                                </div>
                             </div>
-                        </div>
-                        <div class="input-row">
-                            <span class="team-name">${m.away_team || 'TBD'}</span>
-                            <div>
-                                <input type="number" id="a-${m.id}" class="score-input" placeholder="FT" value="${aVal}">
-                                <input type="number" id="ap-${m.id}" class="score-input" style="border-color:#10B981" placeholder="PK" value="${m.away_pen ?? ''}">
+                            <div class="input-row">
+                                <span class="team-name">${m.away_team || 'TBD'}</span>
+                                <div>
+                                    <input type="number" id="a-${m.id}" class="score-input" placeholder="FT" value="${aVal}">
+                                    <input type="number" id="ap-${m.id}" class="score-input" style="border-color:#10B981" placeholder="PK" value="${m.away_pen ?? ''}">
+                                </div>
                             </div>
+                            <button class="btn-primary" onclick="saveMatch(${m.id})">Commit Result</button>
+                            <button class="btn-danger" onclick="resetMatch(${m.id})">Clear Node</button>
                         </div>
-                        <button class="btn-primary" onclick="saveMatch(${m.id})">Commit Result</button>
-                        <button class="btn-danger" onclick="resetMatch(${m.id})">Clear Node</button>
                     </div>
                 `;
             }).join('');
@@ -305,9 +311,9 @@
                     const selected = internalDrawWinners[m.id] || (existing ? existing.pred_winner : '');
                     predictDrawHTML = `
                         <div class="draw-select-box">
-                            <small style="color:var(--accent); display:block; margin-bottom:4px; font-weight:bold;">Draw Guess: Who qualifies?</small>
-                            <button class="draw-btn ${selected === m.home_team ? 'active' : ''}" onclick="setPredictDrawWinner(${m.id}, '${m.home_team}')">${m.home_team}</button>
-                            <button class="draw-btn ${selected === m.away_team ? 'active' : ''}" onclick="setPredictDrawWinner(${m.id}, '${m.away_team}')">${m.away_team}</button>
+                            <small style="color:#60A5FA; display:block; margin-bottom:6px; font-weight:bold;">Draw Guess: Who qualifies?</small>
+                            <div class="draw-btn ${selected === m.home_team ? 'active' : ''}" onclick="setPredictDrawWinner(${m.id}, '${m.home_team}')">${m.home_team}</div>
+                            <div class="draw-btn ${selected === m.away_team ? 'active' : ''}" onclick="setPredictDrawWinner(${m.id}, '${m.away_team}')">${m.away_team}</div>
                         </div>
                     `;
                 }
@@ -317,29 +323,31 @@
 
                 return `
                     <div class="form-card ${isLocked ? 'locked' : ''} ${existing && !isLocked ? 'saved-state' : ''}">
-                        <div class="match-id-badge" style="background:transparent; padding:0 0 8px 0; margin-bottom:8px;">${m.round_name}</div>
+                        <div class="match-id-badge"><span>MATCH ${m.id}</span><span>${m.round_name}</span></div>
                         ${lockBannerHTML}
                         
-                        <div class="input-row">
-                            <span class="team-name">
-                                ${m.home_team || 'TBD'}
-                                ${showHomeFlag ? '<span class="winner-flag-tag">Winner Choice</span>' : ''}
-                            </span>
-                            <input type="number" id="ph-${m.id}" class="score-input" value="${phVal}" ${isLocked ? 'disabled' : ''} oninput="renderUI()">
+                        <div class="form-card-body">
+                            <div class="input-row">
+                                <span class="team-name">
+                                    ${m.home_team || 'TBD'}
+                                    ${showHomeFlag ? '<span class="winner-flag-tag">Pick</span>' : ''}
+                                </span>
+                                <input type="number" id="ph-${m.id}" class="score-input" value="${phVal}" ${isLocked ? 'disabled' : ''} oninput="renderUI()">
+                            </div>
+                            <div class="input-row">
+                                <span class="team-name">
+                                    ${m.away_team || 'TBD'}
+                                    ${showAwayFlag ? '<span class="winner-flag-tag">Pick</span>' : ''}
+                                </span>
+                                <input type="number" id="pa-${m.id}" class="score-input" value="${paVal}" ${isLocked ? 'disabled' : ''} oninput="renderUI()">
+                            </div>
+                            ${predictDrawHTML}
+                            ${isLocked ? (isMatchStarted ? '' : `
+                                <div class="lock-indicator" onclick="unlockedPredictions[${m.id}]=true; renderUI();">🔒 Locked In (Click to Change)</div>
+                            `) : `
+                                <button class="btn-primary" onclick="savePrediction(${m.id})">Lock Prediction</button>
+                            `}
                         </div>
-                        <div class="input-row">
-                            <span class="team-name">
-                                ${m.away_team || 'TBD'}
-                                ${showAwayFlag ? '<span class="winner-flag-tag">Winner Choice</span>' : ''}
-                            </span>
-                            <input type="number" id="pa-${m.id}" class="score-input" value="${paVal}" ${isLocked ? 'disabled' : ''} oninput="renderUI()">
-                        </div>
-                        ${predictDrawHTML}
-                        ${isLocked ? (isMatchStarted ? '' : `
-                            <div class="lock-indicator" onclick="unlockPredictionSlot(${m.id})">🔒 Locked In (Click to Change)</div>
-                        `) : `
-                            <button class="btn-primary" onclick="savePrediction(${m.id})">Lock Prediction</button>
-                        `}
                     </div>
                 `;
             }).join('');
@@ -442,10 +450,11 @@
             const sorted = Object.keys(standings).map(name => ({ name, points: standings[name] })).sort((a,b) => b.points - a.points);
             
             document.getElementById('leaderboard-card').innerHTML = `
+                <div class="match-id-badge" style="border-radius:10px 10px 0 0;"><span>GLOBAL STANDINGS</span><span>POINTS SUMMARY</span></div>
                 <table class="leaderboard-table">
                     <thead><tr><th>Rank</th><th>Player</th><th>Total Points</th></tr></thead>
                     <tbody>
-                        ${sorted.length ? sorted.map((p, idx) => `<tr><td>#${idx+1}</td><td><strong>${p.name}</strong></td><td><span style="color:var(--accent); font-weight:800">${p.points} pts</span></td></tr>`).join('') : '<tr><td colspan="3" style="text-align:center; color:var(--text-muted);">No logs ready yet.</td></tr>'}
+                        ${sorted.length ? sorted.map((p, idx) => `<tr><td style="color:var(--text-muted)">#${idx+1}</td><td><strong style="color:#FFF">${p.name}</strong></td><td><span style="color:var(--accent); font-weight:800">${p.points} pts</span></td></tr>`).join('') : '<tr><td colspan="3" style="text-align:center; color:var(--text-muted);">No logs ready yet.</td></tr>'}
                     </tbody>
                 </table>
             `;
