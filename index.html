@@ -9,7 +9,7 @@
     
     <style>
         :root { 
-            /* Immersive Dark Theme from image_acbdac_2.jpg */
+            /* Immersive Dark Theme */
             --bg-gradient: radial-gradient(circle at 50% 30%, #102A54 0%, #050C1A 70%, #02050B 100%);
             --card-base: #FFFFFF; 
             --border-light: #E2E8F0;
@@ -20,19 +20,19 @@
             --winner-bg: #DCFCE7;
             --winner-text: #166534;
             
-            /* High-Contrast Match Headers */
-            --r16-header: #0284C7; 
-            --qf-header: #7C3AED;  
-            --sf-header: #D97706;  
-            --fn-header: #059669;  
+            /* Coherent & Unified Tournament Palette */
+            --r16-header: #1E40AF; /* Deep Sea Blue */
+            --qf-header:  #4338CA; /* Vibrant Indigo */
+            --sf-header:  #6D28D9; /* Royal Amethyst */
+            --fn-header:  #B45309; /* Gold Champion Accent */
             
-            /* High-Contrast Notification Systems */
-            --lock-bg: #F1F5F9;
-            --lock-text: #334155;
-            --lock-border: #CBD5E1;
-            --awarded-bg: #D1FAE5;
-            --awarded-text: #065F46;
-            --awarded-border: #A7F3D0;
+            /* High-Contrast Action Elements */
+            --action-dark-bg: #0F172A;
+            --action-dark-hover: #1E293B;
+            --lock-dark-bg: #334155;
+            --lock-dark-text: #F8FAFC;
+            --awarded-dark-bg: #065F46;
+            --awarded-dark-text: #F0FDF4;
         }
 
         body { 
@@ -102,7 +102,7 @@
             border: 1px solid rgba(255, 255, 255, 0.1); 
         }
 
-        /* Sleek Capsule Cards matching reference layout style */
+        /* Sleek Capsule Cards */
         .match-card { 
             background: var(--card-base); 
             border-radius: 20px; 
@@ -136,13 +136,13 @@
         
         .form-card { background: var(--card-base); border-radius: 20px; overflow: hidden; position: relative; box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
         .form-card-body { padding: 1.5rem; }
-        .form-card.locked { opacity: 0.95; }
+        .form-card.locked { opacity: 0.98; }
 
-        /* Status Ribbons */
-        .status-ribbon { padding: 10px; text-align: center; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.5px; border-bottom: 2px solid transparent; }
+        /* Status Ribbons - Dark Base Transformation */
+        .status-ribbon { padding: 12px; text-align: center; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.5px; font-family: 'Montserrat', sans-serif; }
         .status-ribbon.updated { background: var(--winner-bg); color: var(--winner-text); }
-        .status-ribbon.locked-banner { background: var(--lock-bg); color: var(--lock-text); border-bottom-color: var(--lock-border); }
-        .status-ribbon.awarded-banner { background: var(--awarded-bg); color: var(--awarded-text); border-bottom-color: var(--awarded-border); }
+        .status-ribbon.locked-banner { background: var(--lock-dark-bg); color: var(--lock-dark-text); }
+        .status-ribbon.awarded-banner { background: var(--awarded-dark-bg); color: var(--awarded-dark-text); }
 
         .input-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; color: var(--text-main); font-weight: 700; }
         .score-input { width: 54px; padding: 8px 4px; border: 2px solid #CBD5E1; border-radius: 8px; text-align: center; background: #FFFFFF; color: var(--text-main); font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.1rem; }
@@ -150,12 +150,14 @@
         .score-input:disabled { background: #F1F5F9; color: var(--text-muted); cursor: not-allowed; }
 
         button { padding: 12px 14px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; font-family: 'Montserrat', sans-serif; font-size: 0.85rem; transition: all 0.2s ease; margin-top: 8px; width: 100%; letter-spacing: 0.5px; text-transform: uppercase; }
-        .btn-primary { background: var(--border-dark); color: white; }
-        .btn-primary:hover:not(:disabled) { background: #1E293B; }
+        .btn-primary { background: var(--action-dark-bg); color: white; }
+        .btn-primary:hover:not(:disabled) { background: var(--action-dark-hover); }
         .btn-danger { background: transparent; color: #DC2626; border: 2px solid rgba(220, 38, 38, 0.2); margin-top: 10px; }
         .btn-danger:hover { background: #FEE2E2; }
         
-        .lock-indicator { display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--accent-blue); font-weight: 800; font-size: 0.85rem; background: rgba(37, 99, 235, 0.08); padding: 12px; border-radius: 8px; cursor: pointer; margin-top: 8px; border: 2px solid rgba(37, 99, 235, 0.15); }
+        /* High Contrast Modify Action Button */
+        .lock-indicator { display: flex; align-items: center; justify-content: center; gap: 6px; background: var(--action-dark-bg); color: #FFFFFF; font-weight: 800; font-size: 0.85rem; padding: 12px; border-radius: 10px; cursor: pointer; margin-top: 8px; font-family: 'Montserrat', sans-serif; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: background 0.2s ease; }
+        .lock-indicator:hover { background: var(--action-dark-hover); }
         
         .draw-select-box { background: rgba(37, 99, 235, 0.04); border: 2px dashed #93C5FD; padding: 12px; border-radius: 10px; margin-bottom: 14px; text-align: center; }
         .draw-btn { background: #FFFFFF; color: var(--text-main); padding: 8px 14px; border-radius: 6px; font-size: 0.8rem; margin: 4px; display: inline-block; border: 2px solid #CBD5E1; font-weight: 800; cursor: pointer; }
@@ -263,20 +265,36 @@
             return 'round-fn';
         }
 
+        /* Fixed Advanced Round Display Bug via Parents Look-back Safeguard */
         function cleanMatchBlock(m) {
             const homeIsWinner = m.winner_team && m.winner_team === m.home_team;
             const awayIsWinner = m.winner_team && m.winner_team === m.away_team;
             const roundClass = getRoundClass(m.id);
 
+            let displayHome = m.home_team;
+            let displayAway = m.away_team;
+            
+            if (m.id >= 9) {
+                const sources = Object.keys(CASCADE_MAP).filter(key => CASCADE_MAP[key].nextMatchId === m.id);
+                const homeSourceId = sources.find(key => CASCADE_MAP[key].slot === 'home');
+                const awaySourceId = sources.find(key => CASCADE_MAP[key].slot === 'away');
+                
+                const homeParent = allMatches.find(p => p.id == homeSourceId);
+                const awayParent = allMatches.find(p => p.id == awaySourceId);
+                
+                if (homeParent && homeParent.winner_team === null) displayHome = null;
+                if (awayParent && awayParent.winner_team === null) displayAway = null;
+            }
+
             return `
                 <div class="match-card ${roundClass}">
                     <div class="match-id-badge"><span>MATCH ${m.id}</span><span style="font-size:0.65rem; opacity:0.8; font-weight:800;">${m.round_name}</span></div>
-                    <div class="team-row ${!m.home_team ? 'tbd' : ''} ${homeIsWinner ? 'winner' : ''}">
-                        <span class="team-name">${m.home_team || 'TBD'}</span>
+                    <div class="team-row ${!displayHome ? 'tbd' : ''} ${homeIsWinner ? 'winner' : ''}">
+                        <span class="team-name">${displayHome || 'TBD'}</span>
                         <span class="score-display">${m.home_score ?? '-'} ${m.home_pen !== null ? `<span class="penalty-badge">PK: ${m.home_pen}</span>` : ''}</span>
                     </div>
-                    <div class="team-row ${!m.away_team ? 'tbd' : ''} ${awayIsWinner ? 'winner' : ''}">
-                        <span class="team-name">${m.away_team || 'TBD'}</span>
+                    <div class="team-row ${!displayAway ? 'tbd' : ''} ${awayIsWinner ? 'winner' : ''}">
+                        <span class="team-name">${displayAway || 'TBD'}</span>
                         <span class="score-display">${m.away_score ?? '-'} ${m.away_pen !== null ? `<span class="penalty-badge">PK: ${m.away_pen}</span>` : ''}</span>
                     </div>
                 </div>
@@ -310,6 +328,15 @@
             return 0;
         }
 
+        /* Returns Spelled Out Version For Prediction Interface Viewports */
+        function getSpelledOutRoundName(m) {
+            if(m.id >= 1 && m.id <= 8) return "Round of 16";
+            if(m.id >= 9 && m.id <= 12) return "Quarter Finals";
+            if(m.id >= 13 && m.id <= 14) return "Semi Finals";
+            if(m.id === 15) return "Final";
+            return "3rd Place Match";
+        }
+
         function renderUI() {
             const r16 = allMatches.filter(m => m.id >= 1 && m.id <= 8);
             const qf = allMatches.filter(m => m.id >= 9 && m.id <= 12);
@@ -335,7 +362,7 @@
 
                 return `
                     <div class="form-card ${roundClass}">
-                        <div class="match-id-badge"><span>MATCH ID: ${m.id}</span><span>${m.round_name}</span></div>
+                        <div class="match-id-badge"><span>MATCH ID: ${m.id}</span><span>${getSpelledOutRoundName(m)}</span></div>
                         ${isUpdated ? `<div class="status-ribbon updated">✓ Result Updated</div>` : ''}
                         <div class="form-card-body">
                             <div class="input-row">
@@ -369,9 +396,9 @@
                 if (isMatchStarted) {
                     const pts = calculateMatchPoints(m, existing);
                     if (pts !== null) {
-                        lockBannerHTML = `<div class="status-ribbon awarded-banner">🏆 MATCH LOCKED (+${pts} PTS AWARDED)</div>`;
+                        lockBannerHTML = `<div class="status-ribbon awarded-banner">🏆 LOCKED (+${pts} PTS AWARDED)</div>`;
                     } else {
-                        lockBannerHTML = '<div class="status-ribbon locked-banner">🔒 MATCH LOCKED: RESULT COMMITTED</div>';
+                        lockBannerHTML = '<div class="status-ribbon locked-banner">🔒 LOCKED: RESULT COMMITTED</div>';
                     }
                 } else if (existing && !unlockedPredictions[m.id]) {
                     lockBannerHTML = '<div class="status-ribbon locked-banner">🔒 PREDICTION LOCKED</div>';
@@ -397,7 +424,7 @@
 
                 return `
                     <div class="form-card ${roundClass} ${isLocked ? 'locked' : ''}">
-                        <div class="match-id-badge"><span>MATCH ${m.id}</span><span>${m.round_name}</span></div>
+                        <div class="match-id-badge"><span>MATCH ${m.id}</span><span>${getSpelledOutRoundName(m)}</span></div>
                         ${lockBannerHTML}
                         
                         <div class="form-card-body">
@@ -475,9 +502,7 @@
             }
         }
 
-        /* Fixed Cascading Clearing Bugs */
         async function resetMatch(id) {
-            // First, reset the root targeted match node
             await db.from('matches').update({
                 home_score: null, 
                 away_score: null, 
@@ -486,7 +511,6 @@
                 winner_team: null
             }).eq('id', id);
 
-            // Traverse and wipe all dependent sequential nodes downstream
             let currentId = id;
             while (CASCADE_MAP[currentId]) {
                 const { nextMatchId, slot } = CASCADE_MAP[currentId];
@@ -547,7 +571,6 @@
             await loadUserPredictions();
         }
 
-        /* Independent Global Scope Leaderboard Display */
         async function calculateLeaderboard() {
             const { data: preds } = await db.from('predictions').select('*');
             if(!preds) return;
