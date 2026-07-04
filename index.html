@@ -55,8 +55,8 @@
 
     <script>
         // --- INPUT YOUR KEYS BELOW ---
-        const CONFIG_URL = 'https://yvkbmelrvdfdjlbanciv.supabase.co'; // Line 74
-        const CONFIG_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2a2JtZWxydmRmZGpsYmFuY2l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxNjM1ODksImV4cCI6MjA5ODczOTU4OX0.BP6DzEGRInduT3bueKlJRoJNGP9I4Pwk7HKxiBGF4A0'; // Line 75
+        const CONFIG_URL = 'https://yvkbmelrvdfdjlbanciv.supabase.co'; // Update this
+        const CONFIG_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2a2JtZWxydmRmZGpsYmFuY2l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxNjM1ODksImV4cCI6MjA5ODczOTU4OX0.BP6DzEGRInduT3bueKlJRoJNGP9I4Pwk7HKxiBGF4A0'; // Update this
         
         const db = window.supabase.createClient(CONFIG_URL, CONFIG_KEY);
         let allMatches = [];
@@ -79,8 +79,8 @@
             document.getElementById('bracket-grid').innerHTML = allMatches.map(m => `
                 <div class="card">
                     <small>${m.round_name}</small>
-                    <div class="match-row">${m.home_team || 'TBD'} <span>${m.home_score ?? ''} ${m.home_pen ? '('+m.home_pen+')' : ''}</span></div>
-                    <div class="match-row">${m.away_team || 'TBD'} <span>${m.away_score ?? ''} ${m.away_pen ? '('+m.away_pen+')' : ''}</span></div>
+                    <div class="match-row">${m.home_team || 'TBD'} <span>${m.home_score ?? ''} ${m.home_pen !== null ? '('+m.home_pen+')' : ''}</span></div>
+                    <div class="match-row">${m.away_team || 'TBD'} <span>${m.away_score ?? ''} ${m.away_pen !== null ? '('+m.away_pen+')' : ''}</span></div>
                 </div>
             `).join('');
 
