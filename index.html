@@ -12,34 +12,31 @@
     <div id="status" class="container"></div> <div id="bracket-grid" class="container"></div>
 
     <script>
-        // 1. Double check these strings!
-        const SUPABASE_URL = 'https://yvkbmelrvdfdjlbanciv.supabase.co'; 
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2a2JtZWxydmRmZGpsYmFuY2l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxNjM1ODksImV4cCI6MjA5ODczOTU4OX0.BP6DzEGRInduT3bueKlJRoJNGP9I4Pwk7HKxiBGF4A0';
+    // Initialize Supabase ONLY ONCE
+    const supabase = supabase.createClient('https://yvkbmelrvdfdjlbanciv.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2a2JtZWxydmRmZGpsYmFuY2l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxNjM1ODksImV4cCI6MjA5ODczOTU4OX0.BP6DzEGRInduT3bueKlJRoJNGP9I4Pwk7HKxiBGF4A0');
 
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        async function loadData() {
-            const statusDiv = document.getElementById('status');
-            try {
-                const { data, error } = await supabase.from('matches').select('*').order('id');
-                if (error) throw error;
-                
-                if (!data || data.length === 0) {
-                    statusDiv.innerHTML = "Connected, but no match data found. Run the SQL again.";
-                    return;
-                }
-
-                document.getElementById('bracket-grid').innerHTML = data.map(m => `
-                    <div style="background:white; padding:10px; margin:5px; border-radius:8px;">
-                        ${m.round_name}: ${m.home_team || 'TBD'} vs ${m.away_team || 'TBD'}
+    async function loadData() {
+        try {
+            const { data, error } = await supabase.from('matches').select('*').order('id');
+            if (error) throw error;
+            
+            const grid = document.getElementById('bracket-grid');
+            if (grid) {
+                grid.innerHTML = data.map(m => `
+                    <div class="card">
+                        <small>${m.round_name}</small>
+                        <h3>${m.home_team || 'TBD'} vs ${m.away_team || 'TBD'}</h3>
+                        <p>Result: ${m.home_score ?? '-'} - ${m.away_score ?? '-'}</p>
                     </div>
                 `).join('');
-            } catch (e) {
-                statusDiv.innerHTML = `<div class="error">Connection Failed: ${e.message}</div>`;
             }
+        } catch (e) {
+            console.error("Data Load Error:", e);
         }
+    }
 
-        loadData();
-    </script>
+    // Run it
+    loadData();
+</script>
 </body>
 </html>
