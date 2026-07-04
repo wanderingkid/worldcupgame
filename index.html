@@ -1,31 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <title>Tournament 2026</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; background: #F1F5F9; color: #1E293B; }
-        .nav { background: #FFFFFF; padding: 1rem; display: flex; justify-content: center; gap: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .card { background: white; border-radius: 12px; padding: 1.5rem; margin: 10px; border: 1px solid #E2E8F0; }
+        :root { --bg: #F1F5F9; --card: #FFFFFF; --primary: #0F172A; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--primary); margin: 0; }
+        .nav { background: white; padding: 1.5rem; display: flex; justify-content: center; gap: 30px; border-bottom: 1px solid #E2E8F0; }
+        .tab { cursor: pointer; font-weight: 600; color: #64748B; }
+        .container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; }
+        .card { background: var(--card); border-radius: 12px; padding: 1.5rem; border: 1px solid #E2E8F0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
     <div class="nav">
-        <div onclick="show('dashboard')">🏆 Bracket</div>
-        <div onclick="show('predict')">✍️ Predictions</div>
-        <div onclick="show('leaderboard')">📈 Leaderboard</div>
+        <div class="tab" onclick="show('dashboard')">🏆 Bracket</div>
+        <div class="tab" onclick="show('predict')">✍️ Predictions</div>
+        <div class="tab" onclick="show('leaderboard')">📈 Leaderboard</div>
     </div>
-    
-    <div id="dashboard" class="container"></div>
-    <div id="predict" class="container" style="display:none"></div>
-    <div id="leaderboard" class="container" style="display:none"></div>
+
+    <div id="dashboard" class="container"><div class="grid" id="bracket-grid"></div></div>
+    <div id="predict" class="container" style="display:none"><h2>Your Predictions</h2><div id="predict-list"></div></div>
+    <div id="leaderboard" class="container" style="display:none"><h2>Leaderboard</h2><div id="rankings"></div></div>
 
     <script>
         const supabase = supabase.createClient('https://yvkbmelrvdfdjlbanciv.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2a2JtZWxydmRmZGpsYmFuY2l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxNjM1ODksImV4cCI6MjA5ODczOTU4OX0.BP6DzEGRInduT3bueKlJRoJNGP9I4Pwk7HKxiBGF4A0');
+
+        async function loadData() {
+            // Fetch Matches
+            const { data: matches } = await supabase.from('matches').select('*').order('id');
+            const grid = document.getElementById('bracket-grid');
+            grid.innerHTML = matches.map(m => `
+                <div class="card">
+                    <small>${m.round_name}</small>
+                    <h3>${m.home_team || 'TBD'} vs ${m.away_team || 'TBD'}</h3>
+                    <p>Result: ${m.home_score ?? '-'} - ${m.away_score ?? '-'}</p>
+                </div>
+            `).join('');
+        }
+
         function show(tab) {
             document.querySelectorAll('.container').forEach(c => c.style.display = 'none');
             document.getElementById(tab).style.display = 'block';
         }
-        // ... (Full fetch and render logic goes here) ...
+
+        loadData();
     </script>
 </body>
 </html>
