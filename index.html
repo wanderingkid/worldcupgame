@@ -112,43 +112,37 @@
         .leaderboard-table th { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
         .leaderboard-table tr:hover td { background: rgba(255,255,255,0.01); }
         
-        .winner-flag-tag { background: rgba(245, 158, 11, 0.15); color: #F59E0B; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; margin-left: auto; border: 1px solid rgba(245, 158, 11, 0.3); display: inline-flex; align-items: center; gap: 3px; }
+        .winner-flag-tag { background: rgba(245, 158, 11, 0.15); color: #F59E0B; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; margin-left: auto; display: inline-flex; align-items: center; gap: 3px; border: 1px solid rgba(245, 158, 11, 0.3); }
     </style>
 </head>
 <body>
 
     <div class="nav">
-        <div class="tab active" onclick="showTab('dashboard', this)">🏆 Bracket</div>
-        <div class="tab" onclick="showTab('predict', this)">✍️ Predictions</div>
-        <div class="tab" onclick="showTab('leaderboard', this)">📈 Leaderboard</div>
+        <div class="tab active" onclick="showTab('dashboard', this)">Bracket</div>
+        <div class="tab" onclick="showTab('predict', this)">Predictions</div>
+        <div class="tab" onclick="showTab('leaderboard', this)">Leaderboard</div>
     </div>
 
-    <!-- Bracket Section -->
     <div id="dashboard" class="container">
         <div class="bracket-wrapper" id="bracket-canvas"></div>
-        <h2 class="admin-section-title">⚙️ Commissioner Tools</h2>
+        <h2 class="admin-section-title">Commissioner Tools</h2>
         <div class="standard-grid" id="admin-grid"></div>
     </div>
 
-    <!-- Predictions Section -->
     <div id="predict" class="container" style="display:none">
-        <h2>✍️ Submit Predictions</h2>
+        <h2>Submit Predictions</h2>
         <div style="margin-bottom: 2rem;">
             <input type="text" id="player-name" placeholder="Enter Player Name (Case-Sensitive)" oninput="loadUserPredictions()">
         </div>
         <div class="standard-grid" id="predict-grid"></div>
     </div>
 
-    <!-- Leaderboard Section -->
     <div id="leaderboard" class="container" style="display:none">
-        <h2>📈 Leaderboard Standings</h2>
+        <h2>Leaderboard Standings</h2>
         <div class="form-card" id="leaderboard-card"></div>
     </div>
 
     <script>
-        // ==========================================
-        // CONFIGURATION - INSERT YOUR SUPABASE VALUES
-        // ==========================================
         const CONFIG_URL = 'https://yvkbmelrvdfdjlbanciv.supabase.co'; 
         const CONFIG_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2a2JtZWxydmRmZGpsYmFuY2l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxNjM1ODksImV4cCI6MjA5ODczOTU4OX0.BP6DzEGRInduT3bueKlJRoJNGP9I4Pwk7HKxiBGF4A0'; 
         
@@ -160,7 +154,6 @@
         let adminDrawWinners = {};
         let unlockedPredictions = {}; 
 
-        // National Flag mapping dictionary
         const flagMap = {
             "Argentina": "🇦🇷", "Brazil": "🇧🇷", "France": "🇫🇷", "Germany": "🇩🇪",
             "Italy": "🇮🇹", "Spain": "🇪🇸", "England": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Portugal": "🇵🇹",
@@ -170,7 +163,7 @@
 
         function getFlag(teamName) {
             if (!teamName) return '';
-            return flagMap[teamName] || '🏳️';
+            return flagMap[teamName] || '';
         }
 
         function showTab(id, el) {
@@ -234,7 +227,6 @@
         }
 
         function renderUI() {
-            // Bracket Splitting
             const r16 = allMatches.filter(m => m.id >= 1 && m.id <= 8);
             const qf = allMatches.filter(m => m.id >= 9 && m.id <= 12);
             const sf = allMatches.filter(m => m.id >= 13 && m.id <= 14);
@@ -251,7 +243,6 @@
                 </div>
             `;
 
-            // Admin Panels
             document.getElementById('admin-grid').innerHTML = allMatches.map(m => {
                 let adminDrawHTML = '';
                 const hVal = document.getElementById(`h-${m.id}`)?.value || (m.home_score ?? '');
@@ -292,7 +283,6 @@
                 `;
             }).join('');
 
-            // Predictions Panels
             document.getElementById('predict-grid').innerHTML = allMatches.map(m => {
                 const existing = userPredictions.find(p => p.match_id === m.id);
                 const isMatchStarted = m.home_score !== null; 
@@ -319,25 +309,25 @@
                 return `
                     <div class="form-card ${isLocked ? 'locked' : ''} ${existing && !isLocked ? 'saved-state' : ''}">
                         <div class="match-id-badge" style="background:transparent; padding:0 0 8px 0; margin-bottom:8px;">${m.round_name}</div>
-                        ${isMatchStarted ? '<div class="match-locked-overlay">⚠️ MATCH LOCKED: RESULT COMMITTED</div>' : ''}
+                        ${isMatchStarted ? '<div class="match-locked-overlay">MATCH LOCKED: RESULT COMMITTED</div>' : ''}
                         
                         <div class="input-row">
                             <span class="team-name">
                                 ${getFlag(m.home_team)} ${m.home_team || 'TBD'}
-                                ${showHomeFlag ? '<span class="winner-flag-tag">🚩 Winner</span>' : ''}
+                                ${showHomeFlag ? '<span class="winner-flag-tag">Winner</span>' : ''}
                             </span>
                             <input type="number" id="ph-${m.id}" class="score-input" value="${phVal}" ${isLocked ? 'disabled' : ''} oninput="renderUI()">
                         </div>
                         <div class="input-row">
                             <span class="team-name">
                                 ${getFlag(m.away_team)} ${m.away_team || 'TBD'}
-                                ${showAwayFlag ? '<span class="winner-flag-tag">🚩 Winner</span>' : ''}
+                                ${showAwayFlag ? '<span class="winner-flag-tag">Winner</span>' : ''}
                             </span>
                             <input type="number" id="pa-${m.id}" class="score-input" value="${paVal}" ${isLocked ? 'disabled' : ''} oninput="renderUI()">
                         </div>
                         ${predictDrawHTML}
                         ${isLocked ? (isMatchStarted ? '' : `
-                            <div class="lock-indicator" onclick="unlockPredictionSlot(${m.id})">🔒 Locked In (Click to Change)</div>
+                            <div class="lock-indicator" onclick="unlockPredictionSlot(${m.id})">Locked In (Click to Change)</div>
                         `) : `
                             <button class="btn-primary" onclick="savePrediction(${m.id})">Lock Prediction</button>
                         `}
@@ -383,11 +373,11 @@
 
         async function savePrediction(matchId) {
             const name = document.getElementById('player-name').value.trim();
-            if (!name) return alert('Input your player handler name first.');
+            if (!name) return alert('Input your player name first.');
             
             const h = document.getElementById(`ph-${matchId}`).value;
             const a = document.getElementById(`pa-${matchId}`).value;
-            if (h === '' || a === '') return alert('Ensure prediction slots contain parameters.');
+            if (h === '' || a === '') return alert('Ensure fields contain numeric values.');
 
             let winnerTeam = null;
             const targetMatch = allMatches.find(m => m.id === matchId);
@@ -400,7 +390,7 @@
                     const existing = userPredictions.find(p => p.match_id === matchId);
                     winnerTeam = existing ? existing.pred_winner : null;
                 }
-                if (!winnerTeam) return alert('For tied guesses, highlight your advancing qualifier.');
+                if (!winnerTeam) return alert('For tied guesses, select your advancing team.');
             }
 
             const payload = {
@@ -419,7 +409,7 @@
             }
             
             unlockedPredictions[matchId] = false;
-            alert('Prediction secured securely.');
+            alert('Prediction saved.');
             await loadUserPredictions();
         }
 
@@ -462,7 +452,7 @@
                 <table class="leaderboard-table">
                     <thead><tr><th>Rank</th><th>Player</th><th>Total Points</th></tr></thead>
                     <tbody>
-                        ${sorted.length ? sorted.map((p, idx) => `<tr><td>#${idx+1}</td><td>${p.name}</td><td><strong>${p.points} pts</strong></td></tr>`).join('') : '<tr><td colspan="3" style="text-align:center; color:var(--text-muted);">No computed calculation results ready yet.</td></tr>'}
+                        ${sorted.length ? sorted.map((p, idx) => `<tr><td>#${idx+1}</td><td>${p.name}</td><td><strong>${p.points} pts</strong></td></tr>`).join('') : '<tr><td colspan="3" style="text-align:center; color:var(--text-muted);">No logs ready yet.</td></tr>'}
                     </tbody>
                 </table>
             `;
