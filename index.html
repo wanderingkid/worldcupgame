@@ -18,7 +18,7 @@
         .card { background: var(--card); border-radius: 12px; padding: 1.5rem; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .match-row { display: flex; justify-content: space-between; align-items: center; font-weight: 600; margin-bottom: 8px; }
         .score-input { width: 45px; padding: 6px; border: 1px solid var(--border); border-radius: 6px; text-align: center; }
-        button { padding: 8px 12px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; }
+        button { padding: 8px 12px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; margin-top: 4px; }
         .btn-primary { background: var(--accent); color: white; }
         .btn-danger { background: var(--danger); color: white; }
         #status-bar { text-align: center; padding: 10px; font-weight: bold; margin-bottom: 1rem; display: none; }
@@ -44,7 +44,10 @@
 
     <div id="predict" class="container" style="display:none">
         <h2>✍️ Predictions</h2>
-        <input type="text" id="player-name" placeholder="Your Name" style="padding:8px; margin-bottom:10px;">
+        <div style="margin-bottom: 1.5rem;">
+            <label style="font-weight: 600;">Your Name: </label>
+            <input type="text" id="player-name" placeholder="Enter your name" style="padding: 8px; border: 1px solid var(--border); border-radius: 6px;">
+        </div>
         <div class="grid" id="predict-grid"></div>
     </div>
 
@@ -55,8 +58,9 @@
 
     <script>
         // --- INPUT YOUR KEYS BELOW ---
-        const CONFIG_URL = 'https://yvkbmelrvdfdjlbanciv.supabase.co'; // Update this
-        const CONFIG_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2a2JtZWxydmRmZGpsYmFuY2l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxNjM1ODksImV4cCI6MjA5ODczOTU4OX0.BP6DzEGRInduT3bueKlJRoJNGP9I4Pwk7HKxiBGF4A0'; // Update this
+        const CONFIG_URL = 'https://yvkbmelrvdfdjlbanciv.supabase.co'; 
+        const CONFIG_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2a2JtZWxydmRmZGpsYmFuY2l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxNjM1ODksImV4cCI6MjA5ODczOTU4OX0.BP6DzEGRInduT3bueKlJRoJNGP9I4Pwk7HKxiBGF4A0
+'; 
         
         const db = window.supabase.createClient(CONFIG_URL, CONFIG_KEY);
         let allMatches = [];
@@ -76,6 +80,7 @@
         }
 
         function renderUI() {
+            // 1. Render Bracket Cards
             document.getElementById('bracket-grid').innerHTML = allMatches.map(m => `
                 <div class="card">
                     <small>${m.round_name}</small>
@@ -84,6 +89,7 @@
                 </div>
             `).join('');
 
+            // 2. Render Admin Commissioner Cards
             document.getElementById('admin-grid').innerHTML = allMatches.map(m => `
                 <div class="card">
                     <small>${m.round_name} (ID: ${m.id})</small>
@@ -97,6 +103,16 @@
                     </div>
                     <button class="btn-primary" onclick="saveMatch(${m.id})">Save</button>
                     <button class="btn-danger" onclick="resetMatch(${m.id})">Reset</button>
+                </div>
+            `).join('');
+
+            // 3. Render User Prediction Cards
+            document.getElementById('predict-grid').innerHTML = allMatches.map(m => `
+                <div class="card">
+                    <small>${m.round_name}</small>
+                    <div class="match-row">${m.home_team || 'TBD'} <input type="number" id="ph-${m.id}" class="score-input"></div>
+                    <div class="match-row">${m.away_team || 'TBD'} <input type="number" id="pa-${m.id}" class="score-input"></div>
+                    <button class="btn-primary" onclick="savePrediction(${m.id})">Save Prediction</button>
                 </div>
             `).join('');
         }
@@ -120,7 +136,32 @@
 
         async function resetMatch(id) {
             await db.from('matches').update({home_score:null, away_score:null, home_pen:null, away_pen:null}).eq('id', id);
-            await initializeApp();
+            initializeApp();
+        }
+
+        async function savePrediction(matchId) {
+            const name = document.getElementById('player-name').value.trim();
+            if (!name) return alert('Please enter your name at the top before submitting.');
+            
+            const h = document.getElementById(`ph-${matchId}`).value;
+            const a = document.getElementById(`pa-${matchId}`).value;
+            if (h === '' || a === '') return alert('Please input scores for both teams.');
+
+            let winnerTeam = null;
+            const targetMatch = allMatches.find(m => m.id === matchId);
+            if (parseInt(h) > parseInt(a)) winnerTeam = targetMatch.home_team;
+            if (parseInt(a) > parseInt(h)) winnerTeam = targetMatch.away_team;
+
+            const data = {
+                player_name: name,
+                match_id: matchId,
+                pred_home: parseInt(h),
+                pred_away: parseInt(a),
+                pred_winner: winnerTeam
+            };
+            
+            await db.from('predictions').insert([data]);
+            alert('Prediction Saved!');
         }
 
         window.addEventListener('DOMContentLoaded', initializeApp);
