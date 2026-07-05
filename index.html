@@ -9,7 +9,6 @@
     
     <style>
         :root { 
-            /* Immersive Dark Theme Base */
             --bg-gradient: radial-gradient(circle at 50% 30%, #102A54 0%, #050C1A 70%, #02050B 100%);
             --card-base: #FFFFFF; 
             --border-light: #E2E8F0;
@@ -20,13 +19,11 @@
             --winner-bg: #DCFCE7;
             --winner-text: #166534;
             
-            /* Coherent & Unified Tournament Palette */
-            --r16-header: #1E40AF; /* Deep Sea Blue */
-            --qf-header:  #4338CA; /* Vibrant Indigo */
-            --sf-header:  #6D28D9; /* Royal Amethyst */
-            --fn-header:  #B45309; /* Gold Champion Accent */
+            --r16-header: #1E40AF; 
+            --qf-header:  #4338CA; 
+            --sf-header:  #6D28D9; 
+            --fn-header:  #B45309; 
             
-            /* High-Contrast Dark Theme Actions */
             --action-dark-bg: #0F172A;
             --action-dark-hover: #1E293B;
             --lock-dark-bg: #334155;
@@ -43,11 +40,10 @@
             min-height: 100vh;
         }
 
-        /* Glassmorphism Header Bar */
         .nav { 
             background: rgba(5, 12, 26, 0.85);
             backdrop-filter: blur(20px);
-            padding: 1rem 2rem; 
+            padding: 1.2rem 2rem; 
             display: flex; 
             justify-content: space-between;
             align-items: center;
@@ -62,18 +58,6 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            flex: 1;
-        }
-
-        .nav-center {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex: 0;
-        }
-
-        .nav-right {
-            justify-content: flex-end;
         }
         
         .tab { 
@@ -92,33 +76,21 @@
         .tab:hover { color: #FFFFFF; background: rgba(255, 255, 255, 0.05); }
         .tab.active { color: #FFFFFF; background: var(--accent-blue); box-shadow: 0 0 20px rgba(37, 99, 235, 0.4); }
 
-        /* Integrated Centerpiece Branding */
-        .brand-logo {
-            height: 75px;
-            width: auto;
-            object-fit: contain;
-            filter: drop-shadow(0px 8px 16px rgba(0, 0, 0, 0.6)) drop-shadow(0px 0px 10px rgba(37, 99, 235, 0.15));
-            transition: transform 0.3s ease;
-        }
-        .brand-logo:hover {
-            transform: scale(1.05);
-        }
-
-        .container { max-width: 1400px; margin: 2.5rem auto; padding: 0 1.5rem; }
+        .container { max-width: 1400px; margin: 2rem auto; padding: 0 1.5rem; }
         
         .page-title {
             text-align: center;
             font-family: 'Montserrat', sans-serif;
             font-weight: 900;
-            font-size: 2.2rem;
-            margin-top: 1rem;
-            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            margin-top: 0.5rem;
+            margin-bottom: 1.5rem;
             letter-spacing: -0.5px;
             text-shadow: 0 0 24px rgba(37, 99, 235, 0.3);
         }
 
-        .bracket-wrapper { display: flex; gap: 2.5rem; overflow-x: auto; padding: 2rem 0; align-items: center; justify-content: flex-start; }
-        .bracket-column { display: flex; flex-direction: column; gap: 2.5rem; min-width: 300px; flex: 1; }
+        .bracket-wrapper { display: flex; gap: 2.5rem; overflow-x: auto; padding: 1.5rem 0; align-items: center; justify-content: flex-start; }
+        .bracket-column { display: flex; flex-direction: column; gap: 2.5rem; min-width: 310px; flex: 1; }
         
         .column-header { 
             font-family: 'Montserrat', sans-serif; 
@@ -135,7 +107,7 @@
             border: 1px solid rgba(255, 255, 255, 0.1); 
         }
 
-        /* Capsule Cards */
+        /* Match Node Enhancements */
         .match-card { 
             background: var(--card-base); 
             border-radius: 20px; 
@@ -152,6 +124,24 @@
         .round-fn .match-id-badge { background: var(--fn-header); color: #FFFFFF; }
 
         .match-id-badge { font-family: 'Montserrat', sans-serif; font-size: 0.75rem; padding: 14px 18px; font-weight: 900; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; }
+
+        /* Integrated Schedule Bar */
+        .match-schedule-bar {
+            background: #F1F5F9;
+            color: #475569;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 6px 18px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .live-countdown-timer {
+            color: var(--accent-blue);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+        }
 
         .team-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; font-weight: 700; border-bottom: 1px solid var(--border-light); color: var(--text-main); }
         .team-row:last-child { border-bottom: none; }
@@ -171,7 +161,6 @@
         .form-card-body { padding: 1.5rem; }
         .form-card.locked { opacity: 0.98; }
 
-        /* Status Ribbons - Dark Transformation */
         .status-ribbon { padding: 12px; text-align: center; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.5px; font-family: 'Montserrat', sans-serif; }
         .status-ribbon.updated { background: var(--winner-bg); color: var(--winner-text); }
         .status-ribbon.locked-banner { background: var(--lock-dark-bg); color: var(--lock-dark-text); }
@@ -188,7 +177,6 @@
         .btn-danger { background: transparent; color: #DC2626; border: 2px solid rgba(220, 38, 38, 0.2); margin-top: 10px; }
         .btn-danger:hover { background: #FEE2E2; }
         
-        /* High Contrast Action Overrides */
         .lock-indicator { display: flex; align-items: center; justify-content: center; gap: 6px; background: var(--action-dark-bg); color: #FFFFFF; font-weight: 800; font-size: 0.85rem; padding: 12px; border-radius: 10px; cursor: pointer; margin-top: 8px; font-family: 'Montserrat', sans-serif; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: background 0.2s ease; }
         .lock-indicator:hover { background: var(--action-dark-hover); }
         
@@ -199,8 +187,8 @@
         input[type="text"] { background: rgba(255, 255, 255, 0.05); border: 2px solid rgba(255, 255, 255, 0.1); padding: 14px 22px; color: #FFFFFF; border-radius: 30px; width: 100%; max-width: 340px; font-family: inherit; font-size: 1rem; font-weight: 700; transition: all 0.2s ease; }
         input[type="text"]:focus { border-color: var(--accent-blue); outline: none; background: rgba(255, 255, 255, 0.1); }
         
-        /* Leaderboard table designs */
-        .leaderboard-container-box { background: var(--card-base); border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
+        /* Leaderboard and Match Insights drawer layout */
+        .leaderboard-container-box { background: var(--card-base); border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.4); margin-bottom: 2rem; }
         .leaderboard-table { width: 100%; border-collapse: collapse; text-align: left; }
         .leaderboard-table th, .leaderboard-table td { padding: 20px 24px; border-bottom: 1px solid var(--border-light); }
         .leaderboard-table th { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 900; background: #F8FAFC; }
@@ -212,6 +200,12 @@
         .podium-2 { background: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; }
         .podium-3 { background: #FFEDD5; color: #C2410C; border: 1px solid #FDBA74; }
         .winner-flag-tag { background: #FEF3C7; color: #B45309; padding: 2px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 800; margin-left: auto; text-transform: uppercase; }
+
+        .spy-drawer-box { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 1.5rem; margin-top: 1rem; }
+        .spy-title { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.1rem; margin-bottom: 1rem; color: #FFFFFF; display: flex; justify-content: space-between; }
+        .spy-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+        .spy-card { background: #FFFFFF; color: var(--text-main); border-radius: 12px; padding: 12px 16px; border: 1px solid var(--border-light); }
+        .spy-user-badge { font-weight: 800; color: var(--accent-blue); font-size: 0.9rem; margin-bottom: 4px; display: block; }
     </style>
 </head>
 <body>
@@ -219,9 +213,6 @@
     <div class="nav">
         <div class="nav-left">
             <div class="tab active" onclick="showTab('dashboard', this)">Bracket Canvas</div>
-        </div>
-        <div class="nav-center">
-            <img src="image.png" alt="FIFA World Cup 2026 Logo" class="brand-logo">
         </div>
         <div class="nav-right">
             <div class="tab" onclick="showTab('predict', this)">My Predictions</div>
@@ -247,6 +238,17 @@
     <div id="leaderboard" class="container" style="display:none">
         <h2 style="font-family:'Montserrat'; font-weight:900; margin-bottom:1.5rem;">Live Ranking Standings</h2>
         <div class="leaderboard-container-box" id="leaderboard-card"></div>
+        
+        <div class="spy-drawer-box">
+            <div class="spy-title">
+                <span>🕵️ Past Predictions Spy Glass</span>
+                <span style="font-size:0.75rem; color:#94A3B8; font-weight:500;">🔒 Future matches remain hidden until local kickoff</span>
+            </div>
+            <div style="margin-bottom:1.5rem;">
+                <select id="spy-match-selector" onchange="renderSpyGrid()" style="padding:10px 16px; border-radius:10px; width:100%; max-width:360px; font-family:inherit; font-weight:700;"></select>
+            </div>
+            <div class="spy-grid" id="spy-results-area"></div>
+        </div>
     </div>
 
     <script>
@@ -257,8 +259,29 @@
         
         let allMatches = [];
         let userPredictions = [];
+        let globalPredictionsCache = [];
         let internalDrawWinners = {}; 
         let unlockedPredictions = {}; 
+
+        // Hardcoded Official Match Schedules mapped in Thailand Time (ICT)
+        const SCHEDULE_MATRIX = {
+            1:  { dateStr: "Sun, July 5",  timeStr: "04:00 AM", iso: "2026-07-05T04:00:00+07:00" }, // Match 89
+            2:  { dateStr: "Sun, July 5",  timeStr: "00:00 AM", iso: "2026-07-05T00:00:00+07:00" }, // Match 90
+            3:  { dateStr: "Mon, July 6",  timeStr: "08:00 AM", iso: "2026-07-06T08:00:00+07:00" }, // Match 91
+            4:  { dateStr: "Mon, July 6",  timeStr: "07:00 AM", iso: "2026-07-06T07:00:00+07:00" }, // Match 92
+            5:  { dateStr: "Tue, July 7",  timeStr: "08:00 AM", iso: "2026-07-07T08:00:00+07:00" }, // Match 93
+            6:  { dateStr: "Tue, July 7",  timeStr: "07:00 AM", iso: "2026-07-07T07:00:00+07:00" }, // Match 94
+            7:  { dateStr: "Wed, July 8",  timeStr: "04:00 AM", iso: "2026-07-08T04:00:00+07:00" }, // Match 95
+            8:  { dateStr: "Wed, July 8",  timeStr: "11:00 AM", iso: "2026-07-08T11:00:00+07:00" }, // Match 96
+            9:  { dateStr: "Fri, July 10", timeStr: "08:00 AM", iso: "2026-07-10T08:00:00+07:00" }, // Match 97
+            10: { dateStr: "Sat, July 11", timeStr: "10:00 AM", iso: "2026-07-11T10:00:00+07:00" }, // Match 98
+            11: { dateStr: "Sun, July 12", timeStr: "09:00 AM", iso: "2026-07-12T09:00:00+07:00" }, // Match 99
+            12: { dateStr: "Sun, July 12", timeStr: "09:00 AM", iso: "2026-07-12T09:00:00+07:00" }, // Match 100
+            13: { dateStr: "Wed, July 15", timeStr: "08:00 AM", iso: "2026-07-15T08:00:00+07:00" }, // Match 101
+            14: { dateStr: "Thu, July 16", timeStr: "07:00 AM", iso: "2026-07-16T07:00:00+07:00" }, // Match 102
+            16: { dateStr: "Sun, July 19", timeStr: "09:00 AM", iso: "2026-07-19T09:00:00+07:00" }, // Match 103 (3rd)
+            15: { dateStr: "Mon, July 20", timeStr: "07:00 AM", iso: "2026-07-20T07:00:00+07:00" }  // Match 104 (Final)
+        };
 
         const CASCADE_MAP = {
             1: { nextMatchId: 9, slot: 'home' },  2: { nextMatchId: 9, slot: 'away' },
@@ -283,7 +306,38 @@
         async function initializeApp() {
             const { data } = await db.from('matches').select('*').order('id');
             allMatches = data || [];
+            
+            // Build Countdown ticking clock loop
+            setInterval(updateCountdowns, 1000);
             renderUI();
+            buildSpySelector();
+        }
+
+        function updateCountdowns() {
+            const now = new Date().getTime();
+            allMatches.forEach(m => {
+                const targetConfig = SCHEDULE_MATRIX[m.id];
+                const timerEl = document.getElementById(`countdown-${m.id}`);
+                if (!timerEl || !targetConfig) return;
+
+                const kickOffTime = new Date(targetConfig.iso).getTime();
+                const distance = kickOffTime - now;
+
+                if (distance < 0) {
+                    timerEl.innerHTML = "• Live / Completed";
+                    timerEl.style.color = "#64748B";
+                } else {
+                    const days = Math.floor(distance / (1000 * 64 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 64 * 60 * 24)) / (1000 * 64 * 60));
+                    const minutes = Math.floor((distance % (1000 * 64 * 60)) / (1000 * 64));
+                    const seconds = Math.floor((distance % (1000 * 64)) / 1000);
+                    
+                    let countdownStr = "• ";
+                    if (days > 0) countdownStr += `${days}d `;
+                    countdownStr += `${hours}h ${minutes}m ${seconds}s`;
+                    timerEl.innerHTML = countdownStr;
+                }
+            });
         }
 
         async function loadUserPredictions() {
@@ -305,11 +359,11 @@
             return 'round-fn';
         }
 
-        /* Front-end Safeguard Check to Hide Premature Advancements */
         function cleanMatchBlock(m) {
             const homeIsWinner = m.winner_team && m.winner_team === m.home_team;
             const awayIsWinner = m.winner_team && m.winner_team === m.away_team;
             const roundClass = getRoundClass(m.id);
+            const sched = SCHEDULE_MATRIX[m.id] || { dateStr: 'TBD', timeStr: '' };
 
             let displayHome = m.home_team;
             let displayAway = m.away_team;
@@ -329,6 +383,10 @@
             return `
                 <div class="match-card ${roundClass}">
                     <div class="match-id-badge"><span>MATCH ${m.id}</span><span style="font-size:0.65rem; opacity:0.8; font-weight:800;">${m.round_name}</span></div>
+                    <div class="match-schedule-bar">
+                        <span>🇹🇭 ${sched.dateStr} - ${sched.timeStr}</span>
+                        <span class="live-countdown-timer" id="countdown-${m.id}">--</span>
+                    </div>
                     <div class="team-row ${!displayHome ? 'tbd' : ''} ${homeIsWinner ? 'winner' : ''}">
                         <span class="team-name">${displayHome || 'TBD'}</span>
                         <span class="score-display">${m.home_score ?? '-'} ${m.home_pen !== null ? `<span class="penalty-badge">PK: ${m.home_pen}</span>` : ''}</span>
@@ -368,7 +426,6 @@
             return 0;
         }
 
-        /* Explicitly Spelled Out Labels for Predictions Viewport */
         function getSpelledOutRoundName(m) {
             if(m.id >= 1 && m.id <= 8) return "Round of 16";
             if(m.id >= 9 && m.id <= 12) return "Quarter Finals";
@@ -492,6 +549,8 @@
                     </div>
                 `;
             }).join('');
+            
+            updateCountdowns();
         }
 
         function setPredictDrawWinner(matchId, selectedTeam) {
@@ -613,21 +672,24 @@
 
         async function calculateLeaderboard() {
             const { data: preds } = await db.from('predictions').select('*');
-            if(!preds) return;
+            globalPredictionsCache = preds || [];
             
             let standings = {};
-            preds.forEach(p => {
+            
+            // Map names first to secure inclusion of 0-point participants
+            globalPredictionsCache.forEach(p => {
+                if (!standings[p.player_name]) standings[p.player_name] = 0;
+                
                 const match = allMatches.find(m => m.id === p.match_id);
                 const pointsAwarded = calculateMatchPoints(match, p);
                 if (pointsAwarded !== null) {
-                    if (!standings[p.player_name]) standings[p.player_name] = 0;
                     standings[p.player_name] += pointsAwarded;
                 }
             });
 
             const sorted = Object.keys(standings).map(name => ({ name, points: standings[name] })).sort((a,b) => b.points - a.points);
             
-            let tableRows = '<tr><td colspan="3" style="text-align:center; color:var(--text-muted); padding:30px;">No predictions processed yet. Add scores to unlock global rankings!</td></tr>';
+            let tableRows = '<tr><td colspan="3" style="text-align:center; color:var(--text-muted); padding:30px;">No predictions registered.</td></tr>';
             if (sorted.length) {
                 tableRows = sorted.map((p, idx) => {
                     let badge = `#${idx + 1}`;
@@ -655,6 +717,63 @@
                     <tbody>${tableRows}</tbody>
                 </table>
             `;
+            
+            renderSpyGrid();
+        }
+
+        function buildSpySelector() {
+            const selector = document.getElementById('spy-match-selector');
+            selector.innerHTML = allMatches.map(m => {
+                return `<option value="${m.id}">Match ${m.id}: ${m.home_team || 'TBD'} vs ${m.away_team || 'TBD'} (${m.round_name})</option>`;
+            }).join('');
+        }
+
+        // Safe Anti-Cheat Prediction Spying Engine
+        function renderSpyGrid() {
+            const matchId = parseInt(document.getElementById('spy-match-selector').value);
+            if(!matchId) return;
+
+            const targetMatch = allMatches.find(m => m.id === matchId);
+            const targetSched = SCHEDULE_MATRIX[matchId];
+            const displayArea = document.getElementById('spy-results-area');
+
+            if(!targetMatch || !targetSched) return;
+
+            const now = new Date().getTime();
+            const kickOffTime = new Date(targetSched.iso).getTime();
+
+            // Verification Check: If the time is before kickoff, trigger anti-spoof shelter
+            if (now < kickOffTime) {
+                displayArea.innerHTML = `
+                    <div style="grid-column: 1 / -1; background:rgba(255,255,255,0.05); text-align:center; padding:2rem; border-radius:12px; color:#94A3B8; font-weight:700;">
+                        🔒 This match hasn't started yet! Player selections will unlock on <strong>${targetSched.dateStr} at ${targetSched.timeStr}</strong> to keep competitive spirit clean.
+                    </div>
+                `;
+                return;
+            }
+
+            const matchPredictions = globalPredictionsCache.filter(p => p.match_id === matchId);
+
+            if(!matchPredictions.length) {
+                displayArea.innerHTML = `<div style="grid-column:1/-1; color:#94A3B8;">No past records submitted for this match block.</div>`;
+                return;
+            }
+
+            displayArea.innerHTML = matchPredictions.map(p => {
+                const ptsEarned = calculateMatchPoints(targetMatch, p);
+                const isWinnerChosen = p.pred_winner ? ` (${p.pred_winner} advances)` : '';
+                return `
+                    <div class="spy-card">
+                        <span class="spy-user-badge">@${p.player_name}</span>
+                        <div style="font-size:0.95rem; font-weight:700; margin:6px 0;">
+                            Prediction: ${p.pred_home} - ${p.pred_away} ${isWinnerChosen}
+                        </div>
+                        <span style="font-size:0.75rem; font-weight:800; color:${ptsEarned > 0 ? 'var(--winner-text)' : '#64748B'}">
+                            ${ptsEarned !== null ? `Result: +${ptsEarned} PTS Awarded` : 'Match Live (Awaiting Score)'}
+                        </span>
+                    </div>
+                `;
+            }).join('');
         }
 
         window.addEventListener('DOMContentLoaded', initializeApp);
