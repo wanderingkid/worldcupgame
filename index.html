@@ -284,63 +284,28 @@
         let unlockedPredictions = {}; 
 
         // Fully Synchronized Tournament Schedule Matrix in Bangkok Time (BKK, UTC+7)
+        // 2. OFFICIAL SCHEDULE MATRIX (BKK TIME)
         const SCHEDULE_MATRIX = {
-            // --- ROUND OF 16 ---
-            1:  { dateStr: "Sun, July 5",    timeStr: "00:00 AM", iso: "2026-07-05T00:00:00+07:00" }, 
-            2:  { dateStr: "Sun, July 5",    timeStr: "04:00 AM", iso: "2026-07-05T04:00:00+07:00" }, 
-            3:  { dateStr: "Mon, July 6",    timeStr: "03:00 AM", iso: "2026-07-06T03:00:00+07:00" }, 
-            4:  { dateStr: "Mon, July 6",    timeStr: "07:00 AM", iso: "2026-07-06T07:00:00+07:00" }, 
-            5:  { dateStr: "Tue, July 7",    timeStr: "02:00 AM", iso: "2026-07-07T02:00:00+07:00" }, 
-            6:  { dateStr: "Tue, July 7",    timeStr: "07:00 AM", iso: "2026-07-07T07:00:00+07:00" }, 
-            7:  { dateStr: "Tue, July 7",    timeStr: "11:00 PM", iso: "2026-07-07T23:00:00+07:00" }, 
-            8:  { dateStr: "Wed, July 8",    timeStr: "03:00 AM", iso: "2026-07-08T03:00:00+07:00" },
-
-            // --- QUARTER FINALS ---
-            9:  { dateStr: "Fri, July 10",   timeStr: "03:00 AM", iso: "2026-07-10T03:00:00+07:00" }, 
-            10: { dateStr: "Sat, July 11",   timeStr: "02:00 AM", iso: "2026-07-11T02:00:00+07:00" }, 
-            11: { dateStr: "Sun, July 12",   timeStr: "04:00 AM", iso: "2026-07-12T04:00:00+07:00" }, 
-            12: { dateStr: "Sun, July 12",   timeStr: "08:00 AM", iso: "2026-07-12T08:00:00+07:00" },
-
-            // --- SEMI FINALS ---
-            13: { dateStr: "Wed, July 15",   timeStr: "02:00 AM", iso: "2026-07-15T02:00:00+07:00" }, 
-            14: { dateStr: "Thu, July 16",   timeStr: "02:00 AM", iso: "2026-07-16T02:00:00+07:00" },
-
-            // --- FINALS WEEKEND ---
-            16: { dateStr: "Sun, July 19",   timeStr: "04:00 AM", iso: "2026-07-19T04:00:00+07:00" }, 
-            15: { dateStr: "Mon, July 20",   timeStr: "02:00 AM", iso: "2026-07-20T02:00:00+07:00" }  
+            1:  { date: "Jul 5", time: "00:00 AM" }, 2:  { date: "Jul 5", time: "04:00 AM" },
+            3:  { date: "Jul 6", time: "03:00 AM" }, 4:  { date: "Jul 6", time: "07:00 AM" },
+            5:  { date: "Jul 7", time: "02:00 AM" }, 6:  { date: "Jul 7", time: "07:00 AM" },
+            7:  { date: "Jul 7", time: "11:00 PM" }, 8:  { date: "Jul 8", time: "03:00 AM" },
+            9:  { date: "Jul 10", time: "03:00 AM" }, 10: { date: "Jul 11", time: "02:00 AM" },
+            11: { date: "Jul 12", time: "04:00 AM" }, 12: { date: "Jul 12", time: "08:00 AM" },
+            13: { date: "Jul 15", time: "02:00 AM" }, 14: { date: "Jul 16", time: "02:00 AM" },
+            16: { date: "Jul 19", time: "04:00 AM" }, 15: { date: "Jul 20", time: "02:00 AM" }
         };
 
-        // CORRECTED CASCADE LOGIC MAP - 100% Synced with official FIFA Bracket Layout
+        // 3. CASCADE LOGIC (Winner to Next / Loser to 3rd Place)
         const CASCADE_MAP = {
-            // Left Bracket - Top Stream (France/Morocco branch)
-            1: { nextMatchId: 9,  slot: 'home' }, 
-            2: { nextMatchId: 9,  slot: 'away' },
-
-            // Left Bracket - Bottom Stream (Portugal/Spain/USA/Belgium branch) -> Goes to QF 2
-            5: { nextMatchId: 10, slot: 'home' }, 
-            6: { nextMatchId: 10, slot: 'away' },
-
-            // Right Bracket - Top Stream (Brazil/Norway/Mexico/England branch) -> Goes to QF 3
-            3: { nextMatchId: 11, slot: 'home' }, 
-            4: { nextMatchId: 11, slot: 'away' },
-
-            // Right Bracket - Bottom Stream (Argentina/Egypt/Switzerland/Colombia branch) -> Goes to QF 4
-            7: { nextMatchId: 12, slot: 'home' }, 
-            8: { nextMatchId: 12, slot: 'away' },
-
-            // Semi-Final Progression
-            9:  { nextMatchId: 13, slot: 'home' }, // Winner QF1
-            10: { nextMatchId: 13, slot: 'away' }, // Winner QF2
-            11: { nextMatchId: 14, slot: 'home' }, // Winner QF3
-            12: { nextMatchId: 14, slot: 'away' }, // Winner QF4
-
-            // Grand Final Progression
-            13: { nextMatchId: 15, slot: 'home' }, // Winner SF1
-            14: { nextMatchId: 15, slot: 'away' }, // Winner SF2
-            
-            // 3rd Place Play-off Progression (Loser Logic)
-            13: { nextMatchId: 16, slot: 'home', type: 'loser' }, // Loser SF1
-            14: { nextMatchId: 16, slot: 'away', type: 'loser' }  // Loser SF2
+            1: { next: 9, slot: 'home' }, 2: { next: 9, slot: 'away' },
+            5: { next: 10, slot: 'home' }, 6: { next: 10, slot: 'away' },
+            3: { next: 11, slot: 'home' }, 4: { next: 11, slot: 'away' },
+            7: { next: 12, slot: 'home' }, 8: { next: 12, slot: 'away' },
+            9: { next: 13, slot: 'home' }, 10: { next: 13, slot: 'away' },
+            11: { next: 14, slot: 'home' }, 12: { next: 14, slot: 'away' },
+            13: { winner: 15, loser: 16 }, // SF1 paths
+            14: { winner: 15, loser: 16 }  // SF2 paths
         };
 
         function showTab(id, el) {
