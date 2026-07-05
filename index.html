@@ -9,7 +9,7 @@
     
     <style>
         :root { 
-            /* Immersive Dark Theme */
+            /* Immersive Dark Theme Base */
             --bg-gradient: radial-gradient(circle at 50% 30%, #102A54 0%, #050C1A 70%, #02050B 100%);
             --card-base: #FFFFFF; 
             --border-light: #E2E8F0;
@@ -26,7 +26,7 @@
             --sf-header:  #6D28D9; /* Royal Amethyst */
             --fn-header:  #B45309; /* Gold Champion Accent */
             
-            /* High-Contrast Action Elements */
+            /* High-Contrast Dark Theme Actions */
             --action-dark-bg: #0F172A;
             --action-dark-hover: #1E293B;
             --lock-dark-bg: #334155;
@@ -45,17 +45,35 @@
 
         /* Glassmorphism Header Bar */
         .nav { 
-            background: rgba(5, 12, 26, 0.8);
+            background: rgba(5, 12, 26, 0.85);
             backdrop-filter: blur(20px);
-            padding: 1.25rem; 
+            padding: 1rem 2rem; 
             display: flex; 
-            justify-content: center; 
-            gap: 30px; 
+            justify-content: space-between;
+            align-items: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .nav-left, .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+
+        .nav-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 0;
+        }
+
+        .nav-right {
+            justify-content: flex-end;
         }
         
         .tab { 
@@ -64,14 +82,27 @@
             font-family: 'Montserrat', sans-serif;
             color: #94A3B8; 
             transition: all 0.2s ease;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             letter-spacing: 0.5px;
-            padding: 10px 24px;
+            padding: 10px 20px;
             border-radius: 30px;
+            white-space: nowrap;
         }
         
         .tab:hover { color: #FFFFFF; background: rgba(255, 255, 255, 0.05); }
         .tab.active { color: #FFFFFF; background: var(--accent-blue); box-shadow: 0 0 20px rgba(37, 99, 235, 0.4); }
+
+        /* Integrated Centerpiece Branding */
+        .brand-logo {
+            height: 75px;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0px 8px 16px rgba(0, 0, 0, 0.6)) drop-shadow(0px 0px 10px rgba(37, 99, 235, 0.15));
+            transition: transform 0.3s ease;
+        }
+        .brand-logo:hover {
+            transform: scale(1.05);
+        }
 
         .container { max-width: 1400px; margin: 2.5rem auto; padding: 0 1.5rem; }
         
@@ -79,8 +110,10 @@
             text-align: center;
             font-family: 'Montserrat', sans-serif;
             font-weight: 900;
-            font-size: 2.5rem;
+            font-size: 2.2rem;
+            margin-top: 1rem;
             margin-bottom: 2rem;
+            letter-spacing: -0.5px;
             text-shadow: 0 0 24px rgba(37, 99, 235, 0.3);
         }
 
@@ -102,7 +135,7 @@
             border: 1px solid rgba(255, 255, 255, 0.1); 
         }
 
-        /* Sleek Capsule Cards */
+        /* Capsule Cards */
         .match-card { 
             background: var(--card-base); 
             border-radius: 20px; 
@@ -138,7 +171,7 @@
         .form-card-body { padding: 1.5rem; }
         .form-card.locked { opacity: 0.98; }
 
-        /* Status Ribbons - Dark Base Transformation */
+        /* Status Ribbons - Dark Transformation */
         .status-ribbon { padding: 12px; text-align: center; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.5px; font-family: 'Montserrat', sans-serif; }
         .status-ribbon.updated { background: var(--winner-bg); color: var(--winner-text); }
         .status-ribbon.locked-banner { background: var(--lock-dark-bg); color: var(--lock-dark-text); }
@@ -155,7 +188,7 @@
         .btn-danger { background: transparent; color: #DC2626; border: 2px solid rgba(220, 38, 38, 0.2); margin-top: 10px; }
         .btn-danger:hover { background: #FEE2E2; }
         
-        /* High Contrast Modify Action Button */
+        /* High Contrast Action Overrides */
         .lock-indicator { display: flex; align-items: center; justify-content: center; gap: 6px; background: var(--action-dark-bg); color: #FFFFFF; font-weight: 800; font-size: 0.85rem; padding: 12px; border-radius: 10px; cursor: pointer; margin-top: 8px; font-family: 'Montserrat', sans-serif; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: background 0.2s ease; }
         .lock-indicator:hover { background: var(--action-dark-hover); }
         
@@ -166,7 +199,7 @@
         input[type="text"] { background: rgba(255, 255, 255, 0.05); border: 2px solid rgba(255, 255, 255, 0.1); padding: 14px 22px; color: #FFFFFF; border-radius: 30px; width: 100%; max-width: 340px; font-family: inherit; font-size: 1rem; font-weight: 700; transition: all 0.2s ease; }
         input[type="text"]:focus { border-color: var(--accent-blue); outline: none; background: rgba(255, 255, 255, 0.1); }
         
-        /* Leaderboard styling */
+        /* Leaderboard table designs */
         .leaderboard-container-box { background: var(--card-base); border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
         .leaderboard-table { width: 100%; border-collapse: collapse; text-align: left; }
         .leaderboard-table th, .leaderboard-table td { padding: 20px 24px; border-bottom: 1px solid var(--border-light); }
@@ -184,13 +217,20 @@
 <body>
 
     <div class="nav">
-        <div class="tab active" onclick="showTab('dashboard', this)">Bracket Canvas</div>
-        <div class="tab" onclick="showTab('predict', this)">My Predictions</div>
-        <div class="tab" onclick="showTab('leaderboard', this)">Leaderboard Standings</div>
+        <div class="nav-left">
+            <div class="tab active" onclick="showTab('dashboard', this)">Bracket Canvas</div>
+        </div>
+        <div class="nav-center">
+            <img src="image.png" alt="FIFA World Cup 2026 Logo" class="brand-logo">
+        </div>
+        <div class="nav-right">
+            <div class="tab" onclick="showTab('predict', this)">My Predictions</div>
+            <div class="tab" onclick="showTab('leaderboard', this)">Leaderboard Standings</div>
+        </div>
     </div>
 
     <div id="dashboard" class="container">
-        <h1 class="page-title">FIFA WORLD CUP 2026</h1>
+        <h1 class="page-title">WORLD CUP 2026 KNOCKOUTS</h1>
         <div class="bracket-wrapper" id="bracket-canvas"></div>
         <h2 class="admin-section-title">🏆 Match Control Centre</h2>
         <div class="standard-grid" id="admin-grid"></div>
@@ -265,7 +305,7 @@
             return 'round-fn';
         }
 
-        /* Fixed Advanced Round Display Bug via Parents Look-back Safeguard */
+        /* Front-end Safeguard Check to Hide Premature Advancements */
         function cleanMatchBlock(m) {
             const homeIsWinner = m.winner_team && m.winner_team === m.home_team;
             const awayIsWinner = m.winner_team && m.winner_team === m.away_team;
@@ -328,7 +368,7 @@
             return 0;
         }
 
-        /* Returns Spelled Out Version For Prediction Interface Viewports */
+        /* Explicitly Spelled Out Labels for Predictions Viewport */
         function getSpelledOutRoundName(m) {
             if(m.id >= 1 && m.id <= 8) return "Round of 16";
             if(m.id >= 9 && m.id <= 12) return "Quarter Finals";
