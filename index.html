@@ -16,14 +16,22 @@
             --text-main: #0F172A; 
             --text-muted: #64748B;
             --accent-blue: #2563EB;
-            --winner-bg: #DCFCE7;
-            --winner-text: #166534;
             
             /* Round Color Progressions */
             --r16-header: #1E40AF; 
             --qf-header:  #4338CA; 
             --sf-header:  #6D28D9; 
             --fn-header:  #8A662D; 
+
+            /* Cohesive Round-Based Pastel Winner Backgrounds */
+            --r16-winner-bg: #E0E7FF; /* Pastel Blue Tint */
+            --r16-winner-text: #1E40AF;
+            --qf-winner-bg:  #E0E7FF; /* Pastel Indigo Tint */
+            --qf-winner-text:  #4338CA;
+            --sf-winner-bg:  #F3E8FF; /* Pastel Purple Tint */
+            --sf-winner-text:  #6D28D9;
+            --fn-winner-bg:  #FEF3C7; /* Pastel Trophy Gold Tint */
+            --fn-winner-text:  #8A662D;
             
             --action-dark-bg: #0F172A;
             --action-dark-hover: #1E293B;
@@ -159,10 +167,14 @@
         .team-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; font-size: 0.95rem; }
         
         .score-display { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; display: inline-flex; align-items: center; gap: 6px; color: var(--text-main); }
-        .penalty-badge { font-size: 0.75rem; color: var(--winner-text); background: #CAFCF2; padding: 2px 6px; border-radius: 4px; font-weight: 800; }
+        .penalty-badge { font-size: 0.75rem; color: inherit; background: rgba(255, 255, 255, 0.6); padding: 2px 6px; border-radius: 4px; font-weight: 800; border: 1px solid dashed; }
         
-        .team-row.winner { background: var(--winner-bg); color: var(--winner-text); }
-        .team-row.winner .score-display { color: var(--winner-text); font-weight: 900; }
+        /* Round-Specific Pastel Winner Modifiers */
+        .round-r16 .team-row.winner { background: var(--r16-winner-bg); color: var(--r16-winner-text); }
+        .round-qf .team-row.winner { background: var(--qf-winner-bg); color: var(--qf-winner-text); }
+        .round-sf .team-row.winner { background: var(--sf-winner-bg); color: var(--sf-winner-text); }
+        .round-fn .team-row.winner { background: var(--fn-winner-bg); color: var(--fn-winner-text); }
+        .team-row.winner .score-display { color: inherit; font-weight: 900; }
 
         .admin-section-title { font-family: 'Montserrat', sans-serif; margin-top: 6rem; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 4rem; font-size: 1.75rem; color: #FFFFFF; text-align: center; font-weight: 900; }
         .standard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem; margin-top: 2rem; }
@@ -172,7 +184,7 @@
         .form-card.locked { opacity: 0.98; }
 
         .status-ribbon { padding: 12px; text-align: center; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.5px; font-family: 'Montserrat', sans-serif; }
-        .status-ribbon.updated { background: var(--winner-bg); color: var(--winner-text); }
+        .status-ribbon.updated { background: #DCFCE7; color: #166534; }
         .status-ribbon.locked-banner { background: var(--lock-dark-bg); color: var(--lock-dark-text); }
         .status-ribbon.awarded-banner { background: var(--awarded-dark-bg); color: var(--awarded-dark-text); }
 
@@ -215,26 +227,6 @@
         .spy-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
         .spy-card { background: #FFFFFF; color: var(--text-main); border-radius: 12px; padding: 12px 16px; border: 1px solid var(--border-light); }
         .spy-user-badge { font-weight: 800; color: var(--accent-blue); font-size: 0.9rem; margin-bottom: 4px; display: block; }
-
-        /* Responsive Layout Fix for Finals Weekend Column */
-        .finals-column {
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* On Mobile screens (when columns collapse/wrap) */
-        @media (max-width: 1024px) {
-            .finals-column {
-                gap: 0 !important;
-            }
-            .final-match-box {
-                order: 2; /* Pushes Final below the 3rd place match on small viewports */
-                margin-top: 2.5rem;
-            }
-            .third-place-box {
-                order: 1; /* Pulls 3rd place to the top */
-            }
-        }
     </style>
 </head>
 <body>
@@ -270,8 +262,7 @@
         
         <div class="spy-drawer-box">
             <div class="spy-title">
-                <span>🕵️ Past Prediction Result</span>
-                <span style="font-size:0.75rem; color:#94A3B8; font-weight:500;">Future matches unlock automatically at kickoff time</span>
+                <span>Past Prediction Result</span>
             </div>
             <div style="margin-bottom:1.5rem;">
                 <select id="spy-match-selector" onchange="renderSpyGrid()" style="padding:10px 16px; border-radius:10px; width:100%; max-width:360px; font-family:inherit; font-weight:700;"></select>
@@ -484,7 +475,7 @@
             if(m.id >= 9 && m.id <= 12) return "Quarter Finals";
             if(m.id >= 13 && m.id <= 14) return "Semi Finals";
             if(m.id === 15) return "Final";
-            return "3rd Place Match";
+            return "3rd Place";
         }
 
         function renderUI() {
@@ -494,20 +485,16 @@
             const f = allMatches.filter(m => m.id === 15);
             const tp = allMatches.filter(m => m.id === 16);
 
+            // Reverted back: Final sits static above 3rd place for all device screen rendering paths
             document.getElementById('bracket-canvas').innerHTML = `
                 <div class="bracket-column"><div class="column-header">Round of 16</div>${r16.map(cleanMatchBlock).join('')}</div>
                 <div class="bracket-column"><div class="column-header">Quarter Finals</div>${qf.map(cleanMatchBlock).join('')}</div>
                 <div class="bracket-column"><div class="column-header">Semi Finals</div>${sf.map(cleanMatchBlock).join('')}</div>
-                
-                <div class="bracket-column finals-column">
-                    <div class="final-match-box">
-                        <div class="column-header">Final</div>
-                        ${f.map(cleanMatchBlock).join('')}
-                    </div>
-                    <div class="third-place-box" style="margin-top: 2rem;">
-                        <div class="column-header">3rd Place Order</div>
-                        ${tp.map(cleanMatchBlock).join('')}
-                    </div>
+                <div class="bracket-column">
+                    <div class="column-header">Final</div>
+                    ${f.map(cleanMatchBlock).join('')}
+                    <div class="column-header" style="margin-top: 2rem;">3rd Place</div>
+                    ${tp.map(cleanMatchBlock).join('')}
                 </div>
             `;
 
@@ -543,7 +530,12 @@
                 `;
             }).join('');
 
-            document.getElementById('predict-grid').innerHTML = allMatches.map(m => {
+            // UX Optimization: Reordered prediction listings specifically to show 3rd Place before Grand Final
+            const nonFinalsPredictionList = allMatches.filter(m => m.id !== 15 && m.id !== 16);
+            const finalsPredictionList = [...tp, ...f]; 
+            const fullyOrderedPredictionGrid = [...nonFinalsPredictionList, ...finalsPredictionList];
+
+            document.getElementById('predict-grid').innerHTML = fullyOrderedPredictionGrid.map(m => {
                 const existing = userPredictions.find(p => p.match_id === m.id);
                 const isMatchStarted = m.home_score !== null; 
                 const isLocked = (existing && !unlockedPredictions[m.id]) || isMatchStarted;
@@ -773,8 +765,8 @@
 
             document.getElementById('leaderboard-card').innerHTML = `
                 <div class="match-id-badge" style="background:linear-gradient(90deg, #F1F5F9 0%, #E2E8F0 100%); padding:18px 24px; color:var(--text-main);">
-                    <span style="font-weight:900; letter-spacing:0.5px;">🏆 GLOBAL WORLD CUP LEADERBOARD</span>
-                    <span style="font-size:0.7rem; font-weight:800; background:#FFFFFF; padding:4px 10px; border-radius:20px; border:1px solid #CBD5E1;">ALL PLAYERS</span>
+                    <span style="font-weight:900; letter-spacing:0.5px;">🏆 WORLD CUP LEADERBOARD</span>
+                    <span style="font-size:0.5rem; font-weight:800; background:#FFFFFF; padding:4px 10px; border-radius:20px; border:1px solid #CBD5E1;">ALL PLAYERS</span>
                 </div>
                 <table class="leaderboard-table">
                     <thead><tr><th>Rank</th><th>Player Name</th><th>Total Score</th></tr></thead>
@@ -817,7 +809,7 @@
             const matchPredictions = globalPredictionsCache.filter(p => p.match_id === matchId);
 
             if(!matchPredictions.length) {
-                displayArea.innerHTML = `<div style="grid-column:1/-1; color:#94A3B8;">No past records submitted for this match block.</div>`;
+                displayArea.innerHTML = `<div style="grid-column:1/-1; color:#94A3B8;">Records only shown once the selected match is completed</div>`;
                 return;
             }
 
