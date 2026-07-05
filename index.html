@@ -23,7 +23,6 @@
             --r16-header: #1E40AF; 
             --qf-header:  #4338CA; 
             --sf-header:  #6D28D9; 
-            /* NEW: Deep Majestic Trophy Gold to signify the ultimate greatness of the Finals */
             --fn-header:  #8A662D; 
             
             --action-dark-bg: #0F172A;
@@ -216,17 +215,37 @@
         .spy-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
         .spy-card { background: #FFFFFF; color: var(--text-main); border-radius: 12px; padding: 12px 16px; border: 1px solid var(--border-light); }
         .spy-user-badge { font-weight: 800; color: var(--accent-blue); font-size: 0.9rem; margin-bottom: 4px; display: block; }
+
+        /* Responsive Layout Fix for Finals Weekend Column */
+        .finals-column {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* On Mobile screens (when columns collapse/wrap) */
+        @media (max-width: 1024px) {
+            .finals-column {
+                gap: 0 !important;
+            }
+            .final-match-box {
+                order: 2; /* Pushes Final below the 3rd place match on small viewports */
+                margin-top: 2.5rem;
+            }
+            .third-place-box {
+                order: 1; /* Pulls 3rd place to the top */
+            }
+        }
     </style>
 </head>
 <body>
 
     <div class="nav">
         <div class="nav-left">
-            <div class="tab active" onclick="showTab('dashboard', this)">Bracket Canvas</div>
+            <div class="tab active" onclick="showTab('dashboard', this)">Tournament</div>
         </div>
         <div class="nav-right">
             <div class="tab" onclick="showTab('predict', this)">My Predictions</div>
-            <div class="tab" onclick="showTab('leaderboard', this)">Leaderboard Standings</div>
+            <div class="tab" onclick="showTab('leaderboard', this)">Leaderboard</div>
         </div>
     </div>
 
@@ -273,23 +292,31 @@
         let internalDrawWinners = {}; 
         let unlockedPredictions = {}; 
 
+        // Fully Synchronized Tournament Schedule Matrix in Bangkok Time (BKK, UTC+7)
         const SCHEDULE_MATRIX = {
-            1:  { dateStr: "Sunday, July 5",    timeStr: "04:00 AM", iso: "2026-07-05T04:00:00+07:00" }, 
-            2:  { dateStr: "Sunday, July 5",    timeStr: "00:00 AM", iso: "2026-07-05T00:00:00+07:00" }, 
-            3:  { dateStr: "Monday, July 6",    timeStr: "08:00 AM", iso: "2026-07-06T08:00:00+07:00" }, 
-            4:  { dateStr: "Monday, July 6",    timeStr: "07:00 AM", iso: "2026-07-06T07:00:00+07:00" }, 
-            5:  { dateStr: "Tuesday, July 7",   timeStr: "08:00 AM", iso: "2026-07-07T08:00:00+07:00" }, 
-            6:  { dateStr: "Tuesday, July 7",   timeStr: "07:00 AM", iso: "2026-07-07T07:00:00+07:00" }, 
-            7:  { dateStr: "Wednesday, July 8", timeStr: "04:00 AM", iso: "2026-07-08T04:00:00+07:00" }, 
-            8:  { dateStr: "Wednesday, July 8", timeStr: "11:00 AM", iso: "2026-07-08T11:00:00+07:00" }, 
-            9:  { dateStr: "Friday, July 10",   timeStr: "08:00 AM", iso: "2026-07-10T08:00:00+07:00" }, 
-            10: { dateStr: "Saturday, July 11", timeStr: "10:00 AM", iso: "2026-07-11T10:00:00+07:00" }, 
-            11: { dateStr: "Sunday, July 12",   timeStr: "09:00 AM", iso: "2026-07-12T09:00:00+07:00" }, 
-            12: { dateStr: "Sunday, July 12",   timeStr: "09:00 AM", iso: "2026-07-12T09:00:00+07:00" }, 
-            13: { dateStr: "Wednesday, July 15",timeStr: "08:00 AM", iso: "2026-07-15T08:00:00+07:00" }, 
-            14: { dateStr: "Thursday, July 16", timeStr: "07:00 AM", iso: "2026-07-16T07:00:00+07:00" }, 
-            16: { dateStr: "Sunday, July 19",   timeStr: "09:00 AM", iso: "2026-07-19T09:00:00+07:00" }, 
-            15: { dateStr: "Monday, July 20",   timeStr: "07:00 AM", iso: "2026-07-20T07:00:00+07:00" }  
+            // --- ROUND OF 16 ---
+            1:  { dateStr: "Sun, July 5",    timeStr: "00:00 AM", iso: "2026-07-05T00:00:00+07:00" }, 
+            2:  { dateStr: "Sun, July 5",    timeStr: "04:00 AM", iso: "2026-07-05T04:00:00+07:00" }, 
+            3:  { dateStr: "Mon, July 6",    timeStr: "03:00 AM", iso: "2026-07-06T03:00:00+07:00" }, 
+            4:  { dateStr: "Mon, July 6",    timeStr: "07:00 AM", iso: "2026-07-06T07:00:00+07:00" }, 
+            5:  { dateStr: "Tue, July 7",    timeStr: "02:00 AM", iso: "2026-07-07T02:00:00+07:00" }, 
+            6:  { dateStr: "Tue, July 7",    timeStr: "07:00 AM", iso: "2026-07-07T07:00:00+07:00" }, 
+            7:  { dateStr: "Tue, July 7",    timeStr: "11:00 PM", iso: "2026-07-07T23:00:00+07:00" }, 
+            8:  { dateStr: "Wed, July 8",    timeStr: "03:00 AM", iso: "2026-07-08T03:00:00+07:00" }, 
+
+            // --- QUARTER FINALS ---
+            9:  { dateStr: "Fri, July 10",   timeStr: "03:00 AM", iso: "2026-07-10T03:00:00+07:00" }, 
+            10: { dateStr: "Sat, July 11",   timeStr: "05:00 AM", iso: "2026-07-11T05:00:00+07:00" }, 
+            11: { dateStr: "Sun, July 12",   timeStr: "03:00 AM", iso: "2026-07-12T03:00:00+07:00" }, 
+            12: { dateStr: "Sun, July 12",   timeStr: "06:00 AM", iso: "2026-07-12T06:00:00+07:00" }, 
+
+            // --- SEMI FINALS ---
+            13: { dateStr: "Wed, July 15",   timeStr: "07:00 AM", iso: "2026-07-15T07:00:00+07:00" }, 
+            14: { dateStr: "Thu, July 16",   timeStr: "07:00 AM", iso: "2026-07-16T07:00:00+07:00" }, 
+
+            // --- FINALS WEEKEND ---
+            16: { dateStr: "Sun, July 19",   timeStr: "03:00 AM", iso: "2026-07-19T03:00:00+07:00" }, 
+            15: { dateStr: "Mon, July 20",   timeStr: "02:00 AM", iso: "2026-07-20T02:00:00+07:00" }  
         };
 
         const CASCADE_MAP = {
@@ -471,9 +498,16 @@
                 <div class="bracket-column"><div class="column-header">Round of 16</div>${r16.map(cleanMatchBlock).join('')}</div>
                 <div class="bracket-column"><div class="column-header">Quarter Finals</div>${qf.map(cleanMatchBlock).join('')}</div>
                 <div class="bracket-column"><div class="column-header">Semi Finals</div>${sf.map(cleanMatchBlock).join('')}</div>
-                <div class="bracket-column">
-                    <div class="column-header">Finals</div>${f.map(cleanMatchBlock).join('')}
-                    <div class="column-header" style="margin-top: 2rem;">3rd Place Order</div>${tp.map(cleanMatchBlock).join('')}
+                
+                <div class="bracket-column finals-column">
+                    <div class="final-match-box">
+                        <div class="column-header">Final</div>
+                        ${f.map(cleanMatchBlock).join('')}
+                    </div>
+                    <div class="third-place-box" style="margin-top: 2rem;">
+                        <div class="column-header">3rd Place Order</div>
+                        ${tp.map(cleanMatchBlock).join('')}
+                    </div>
                 </div>
             `;
 
