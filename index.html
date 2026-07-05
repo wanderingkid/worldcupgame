@@ -124,7 +124,6 @@
 
         .match-id-badge { font-family: 'Montserrat', sans-serif; font-size: 0.75rem; padding: 14px 18px; font-weight: 900; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; }
 
-        /* Integrated Schedule Component Styles */
         .match-schedule-bar {
             background: #F1F5F9;
             color: #475569;
@@ -142,7 +141,6 @@
             color: var(--accent-blue);
         }
         
-        /* Smooth Blink Animation for Live Matchdays */
         .status-live-pulse {
             color: #EF4444;
             font-weight: 900;
@@ -273,7 +271,6 @@
         let internalDrawWinners = {}; 
         let unlockedPredictions = {}; 
 
-        // Spelled out days with precise ISO timezone vectors
         const SCHEDULE_MATRIX = {
             1:  { dateStr: "Sunday, July 5",    timeStr: "04:00 AM", iso: "2026-07-05T04:00:00+07:00" }, 
             2:  { dateStr: "Sunday, July 5",    timeStr: "00:00 AM", iso: "2026-07-05T00:00:00+07:00" }, 
@@ -322,7 +319,6 @@
             buildSpySelector();
         }
 
-        // Live + 120min completed status validation loop
         function updateCountdowns() {
             const now = new Date().getTime();
             allMatches.forEach(m => {
@@ -471,3 +467,342 @@
 
             document.getElementById('bracket-canvas').innerHTML = `
                 <div class="bracket-column"><div class="column-header">Round of 16</div>${r16.map(cleanMatchBlock).join('')}</div>
+                <div class="bracket-column"><div class="column-header">Quarter Finals</div>${qf.map(cleanMatchBlock).join('')}</div>
+                <div class="bracket-column"><div class="column-header">Semi Finals</div>${sf.map(cleanMatchBlock).join('')}</div>
+                <div class="bracket-column">
+                    <div class="column-header">Finals</div>${f.map(cleanMatchBlock).join('')}
+                    <div class="column-header" style="margin-top: 2rem;">3rd Place Order</div>${tp.map(cleanMatchBlock).join('')}
+                </div>
+            `;
+
+            document.getElementById('admin-grid').innerHTML = allMatches.map(m => {
+                const hVal = m.home_score ?? '';
+                const aVal = m.away_score ?? '';
+                const roundClass = getRoundClass(m.id);
+                const isUpdated = m.home_score !== null;
+
+                return `
+                    <div class="form-card ${roundClass}">
+                        <div class="match-id-badge"><span>MATCH ID: ${m.id}</span><span>${getSpelledOutRoundName(m)}</span></div>
+                        ${isUpdated ? `<div class="status-ribbon updated">✓ Result Updated</div>` : ''}
+                        <div class="form-card-body">
+                            <div class="input-row">
+                                <span class="team-name">${m.home_team || 'TBD'}</span>
+                                <div>
+                                    <input type="number" id="h-${m.id}" class="score-input" placeholder="FT" value="${hVal}">
+                                    <input type="number" id="hp-${m.id}" class="score-input" style="border-color:#10B981" placeholder="PK" value="${m.home_pen ?? ''}">
+                                </div>
+                            </div>
+                            <div class="input-row">
+                                <span class="team-name">${m.away_team || 'TBD'}</span>
+                                <div>
+                                    <input type="number" id="a-${m.id}" class="score-input" placeholder="FT" value="${aVal}">
+                                    <input type="number" id="ap-${m.id}" class="score-input" style="border-color:#10B981" placeholder="PK" value="${m.away_pen ?? ''}">
+                                </div>
+                            </div>
+                            <button class="btn-primary" onclick="saveMatch(${m.id})">Commit Result</button>
+                            <button class="btn-danger" onclick="resetMatch(${m.id})">Clear Node</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('predict-grid').innerHTML = allMatches.map(m => {
+                const existing = userPredictions.find(p => p.match_id === m.id);
+                const isMatchStarted = m.home_score !== null; 
+                const isLocked = (existing && !unlockedPredictions[m.id]) || isMatchStarted;
+                const roundClass = getRoundClass(m.id);
+                const sched = SCHEDULE_MATRIX[m.id] || { dateStr: 'TBD', timeStr: '' };
+                
+                let lockBannerHTML = '';
+                if (isMatchStarted) {
+                    const pts = calculateMatchPoints(m, existing);
+                    if (pts !== null) {
+                        lockBannerHTML = `<div class="status-ribbon awarded-banner">🏆 LOCKED (+${pts} PTS AWARDED)</div>`;
+                    } else {
+                        lockBannerHTML = '<div class="status-ribbon locked-banner">🔒 LOCKED: RESULT COMMITTED</div>';
+                    }
+                } else if (existing && !unlockedPredictions[m.id]) {
+                    lockBannerHTML = '<div class="status-ribbon locked-banner">🔒 PREDICTION LOCKED</div>';
+                }
+
+                let predictDrawHTML = '';
+                const phVal = document.getElementById(`ph-${m.id}`)?.value || (existing ? existing.pred_home : '');
+                const paVal = document.getElementById(`pa-${m.id}`)?.value || (existing ? existing.pred_away : '');
+
+                if (!isLocked && phVal !== '' && paVal !== '' && parseInt(phVal) === parseInt(paVal) && m.home_team && m.away_team) {
+                    const selected = internalDrawWinners[m.id] || (existing ? existing.pred_winner : '');
+                    predictDrawHTML = `
+                        <div class="draw-select-box">
+                            <small style="color:var(--accent-blue); display:block; margin-bottom:6px; font-weight:900;">Who advances on penalties?</small>
+                            <div class="draw-btn ${selected === m.home_team ? 'active' : ''}" onclick="setPredictDrawWinner(${m.id}, '${m.home_team}')">${m.home_team}</div>
+                            <div class="draw-btn ${selected === m.away_team ? 'active' : ''}" onclick="setPredictDrawWinner(${m.id}, '${m.away_team}')">${m.away_team}</div>
+                        </div>
+                    `;
+                }
+
+                const showHomeFlag = existing?.pred_winner === m.home_team && m.home_team;
+                const showAwayFlag = existing?.pred_winner === m.away_team && m.away_team;
+
+                return `
+                    <div class="form-card ${roundClass} ${isLocked ? 'locked' : ''}">
+                        <div class="match-id-badge"><span>MATCH ${m.id}</span><span>${getSpelledOutRoundName(m)}</span></div>
+                        <div class="match-schedule-bar">
+                            <span>${sched.dateStr} - ${sched.timeStr}</span>
+                            <span class="live-countdown-timer" id="predict-countdown-${m.id}">--</span>
+                        </div>
+                        ${lockBannerHTML}
+                        
+                        <div class="form-card-body">
+                            <div class="input-row">
+                                <span class="team-name">
+                                    ${m.home_team || 'TBD'}
+                                    ${showHomeFlag ? '<span class="winner-flag-tag">Pick</span>' : ''}
+                                </span>
+                                <input type="number" id="ph-${m.id}" class="score-input" value="${phVal}" ${isLocked ? 'disabled' : ''} onfocus="this.select()" oninput="renderUI()">
+                            </div>
+                            <div class="input-row">
+                                <span class="team-name">
+                                    ${m.away_team || 'TBD'}
+                                    ${showAwayFlag ? '<span class="winner-flag-tag">Pick</span>' : ''}
+                                </span>
+                                <input type="number" id="pa-${m.id}" class="score-input" value="${paVal}" ${isLocked ? 'disabled' : ''} onfocus="this.select()" oninput="renderUI()">
+                            </div>
+                            ${predictDrawHTML}
+                            ${isLocked ? (isMatchStarted ? '' : `
+                                <div class="lock-indicator" onclick="unlockedPredictions[${m.id}]=true; renderUI(); setTimeout(() => document.getElementById('ph-${m.id}').focus(), 50);">🔓 Change Prediction</div>
+                            `) : `
+                                <button class="btn-primary" onclick="savePrediction(${m.id})">Lock Prediction</button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            updateCountdowns();
+        }
+
+        function setPredictDrawWinner(matchId, selectedTeam) {
+            internalDrawWinners[matchId] = selectedTeam;
+            renderUI();
+        }
+
+        async function saveMatch(id) {
+            const h = document.getElementById(`h-${id}`).value;
+            const a = document.getElementById(`a-${id}`).value;
+            const hp = document.getElementById(`hp-${id}`).value;
+            const ap = document.getElementById(`ap-${id}`).value;
+
+            if(h === '' || a === '') return alert('Please input score values.');
+
+            let winner = null;
+            const target = allMatches.find(m => m.id === id);
+            
+            if (parseInt(h) > parseInt(a)) {
+                winner = target.home_team;
+            } else if (parseInt(a) > parseInt(h)) {
+                winner = target.away_team;
+            } else {
+                if (hp === '' || ap === '') return alert('Ties require penalty shootout (PK) scores!');
+                if (parseInt(hp) === parseInt(ap)) return alert('PK shootout scores cannot end in a draw.');
+                winner = (parseInt(hp) > parseInt(ap)) ? target.home_team : target.away_team;
+            }
+
+            const data = {
+                home_score: parseInt(h),
+                away_score: parseInt(a),
+                home_pen: hp !== '' ? parseInt(hp) : null,
+                away_pen: ap !== '' ? parseInt(ap) : null,
+                winner_team: winner
+            };
+            
+            await db.from('matches').update(data).eq('id', id);
+            await advanceNextRoundSlot(id, winner); 
+            await initializeApp();
+        }
+
+        async function advanceNextRoundSlot(sourceId, winnerName) {
+            if (CASCADE_MAP[sourceId]) {
+                const { nextMatchId, slot } = CASCADE_MAP[sourceId];
+                const updatePayload = {};
+                updatePayload[`${slot}_team`] = winnerName;
+                await db.from('matches').update(updatePayload).eq('id', nextMatchId);
+            }
+        }
+
+        async function resetMatch(id) {
+            await db.from('matches').update({
+                home_score: null, 
+                away_score: null, 
+                home_pen: null, 
+                away_pen: null, 
+                winner_team: null
+            }).eq('id', id);
+
+            let currentId = id;
+            while (CASCADE_MAP[currentId]) {
+                const { nextMatchId, slot } = CASCADE_MAP[currentId];
+                
+                const updatePayload = {};
+                updatePayload[`${slot}_team`] = null; 
+                updatePayload['home_score'] = null;   
+                updatePayload['away_score'] = null;
+                updatePayload['home_pen'] = null;
+                updatePayload['away_pen'] = null;
+                updatePayload['winner_team'] = null;
+
+                await db.from('matches').update(updatePayload).eq('id', nextMatchId);
+                currentId = nextMatchId; 
+            }
+
+            await initializeApp();
+        }
+
+        async function savePrediction(matchId) {
+            const name = document.getElementById('player-name').value.trim();
+            if (!name) return alert('Input your tracking handler name.');
+            
+            const h = document.getElementById(`ph-${matchId}`).value;
+            const a = document.getElementById(`pa-${matchId}`).value;
+            if (h === '' || a === '') return alert('Ensure prediction scores are complete.');
+
+            let winnerTeam = null;
+            const targetMatch = allMatches.find(m => m.id === matchId);
+            
+            if (parseInt(h) > parseInt(a)) winnerTeam = targetMatch.home_team;
+            else if (parseInt(a) > parseInt(h)) winnerTeam = targetMatch.away_team;
+            else {
+                winnerTeam = internalDrawWinners[matchId];
+                if (!winnerTeam) {
+                    const existing = userPredictions.find(p => p.match_id === matchId);
+                    winnerTeam = existing ? existing.pred_winner : null;
+                }
+                if (!winnerTeam) return alert('Highlight which team advances for tied scores.');
+            }
+
+            const payload = {
+                player_name: name,
+                match_id: matchId,
+                pred_home: parseInt(h),
+                pred_away: parseInt(a),
+                pred_winner: winnerTeam
+            };
+
+            const existing = userPredictions.find(p => p.match_id === matchId);
+            if (existing) {
+                await db.from('predictions').update(payload).eq('id', existing.id);
+            } else {
+                await db.from('predictions').insert([payload]);
+            }
+            
+            unlockedPredictions[matchId] = false;
+            await loadUserPredictions();
+        }
+
+        async function calculateLeaderboard() {
+            const { data: preds } = await db.from('predictions').select('*');
+            globalPredictionsCache = preds || [];
+            
+            let standings = {};
+            
+            globalPredictionsCache.forEach(p => {
+                if (!standings[p.player_name]) standings[p.player_name] = 0;
+                
+                const match = allMatches.find(m => m.id === p.match_id);
+                const pointsAwarded = calculateMatchPoints(match, p);
+                if (pointsAwarded !== null) {
+                    standings[p.player_name] += pointsAwarded;
+                }
+            });
+
+            const sorted = Object.keys(standings).map(name => ({ name, points: standings[name] })).sort((a,b) => b.points - a.points);
+            
+            let tableRows = '<tr><td colspan="3" style="text-align:center; color:var(--text-muted); padding:30px;">No predictions registered.</td></tr>';
+            if (sorted.length) {
+                tableRows = sorted.map((p, idx) => {
+                    let badge = `#${idx + 1}`;
+                    if (idx === 0) badge = `<span class="podium-badge podium-1">1</span>`;
+                    if (idx === 1) badge = `<span class="podium-badge podium-2">2</span>`;
+                    if (idx === 2) badge = `<span class="podium-badge podium-3">3</span>`;
+                    
+                    return `
+                        <tr>
+                            <td>${badge}</td>
+                            <td><strong style="color:var(--text-main); font-size:1.05rem;">${p.name}</strong></td>
+                            <td><span style="color:var(--accent-blue); font-weight:900; font-size:1.05rem;">${p.points} PTS</span></td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            document.getElementById('leaderboard-card').innerHTML = `
+                <div class="match-id-badge" style="background:linear-gradient(90deg, #F1F5F9 0%, #E2E8F0 100%); padding:18px 24px; color:var(--text-main);">
+                    <span style="font-weight:900; letter-spacing:0.5px;">🏆 GLOBAL WORLD CUP LEADERBOARD</span>
+                    <span style="font-size:0.7rem; font-weight:800; background:#FFFFFF; padding:4px 10px; border-radius:20px; border:1px solid #CBD5E1;">ALL PLAYERS</span>
+                </div>
+                <table class="leaderboard-table">
+                    <thead><tr><th>Rank</th><th>Player Name</th><th>Total Score</th></tr></thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+            `;
+            
+            renderSpyGrid();
+        }
+
+        function buildSpySelector() {
+            const selector = document.getElementById('spy-match-selector');
+            selector.innerHTML = allMatches.map(m => {
+                return `<option value="${m.id}">Match ${m.id}: ${m.home_team || 'TBD'} vs ${m.away_team || 'TBD'} (${m.round_name})</option>`;
+            }).join('');
+        }
+
+        function renderSpyGrid() {
+            const matchId = parseInt(document.getElementById('spy-match-selector').value);
+            if(!matchId) return;
+
+            const targetMatch = allMatches.find(m => m.id === matchId);
+            const targetSched = SCHEDULE_MATRIX[matchId];
+            const displayArea = document.getElementById('spy-results-area');
+
+            if(!targetMatch || !targetSched) return;
+
+            const now = new Date().getTime();
+            const kickOffTime = new Date(targetSched.iso).getTime();
+
+            if (now < kickOffTime) {
+                displayArea.innerHTML = `
+                    <div style="grid-column: 1 / -1; background:rgba(255,255,255,0.05); text-align:center; padding:2rem; border-radius:12px; color:#94A3B8; font-weight:700;">
+                        🔒 Selections remain hidden until kickoff on <strong>${targetSched.dateStr} at ${targetSched.timeStr}</strong> to prevent copying.
+                    </div>
+                `;
+                return;
+            }
+
+            const matchPredictions = globalPredictionsCache.filter(p => p.match_id === matchId);
+
+            if(!matchPredictions.length) {
+                displayArea.innerHTML = `<div style="grid-column:1/-1; color:#94A3B8;">No past records submitted for this match block.</div>`;
+                return;
+            }
+
+            displayArea.innerHTML = matchPredictions.map(p => {
+                const ptsEarned = calculateMatchPoints(targetMatch, p);
+                const isWinnerChosen = p.pred_winner ? ` (${p.pred_winner} advances)` : '';
+                return `
+                    <div class="spy-card">
+                        <span class="spy-user-badge">@${p.player_name}</span>
+                        <div style="font-size:0.95rem; font-weight:700; margin:6px 0;">
+                            Prediction: ${p.pred_home} - ${p.pred_away} ${isWinnerChosen}
+                        </div>
+                        <span style="font-size:0.75rem; font-weight:800; color:${ptsEarned > 0 ? 'var(--winner-text)' : '#64748B'}">
+                            ${ptsEarned !== null ? `Result: +${ptsEarned} PTS Awarded` : 'Match Live (Awaiting Final Score)'}
+                        </span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+</html>
