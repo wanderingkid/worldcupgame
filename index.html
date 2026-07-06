@@ -210,9 +210,12 @@
         input[type="text"]:focus { border-color: var(--accent-blue); outline: none; background: rgba(255, 255, 255, 0.1); }
         
         .leaderboard-container-box { background: var(--card-base); border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.4); margin-bottom: 2rem; }
-        .leaderboard-table { width: 100%; border-collapse: collapse; text-align: left; }
-        .leaderboard-table th, .leaderboard-table td { padding: 20px 24px; border-bottom: 1px solid var(--border-light); }
+        .leaderboard-table { width: 100%; border-collapse: collapse; text-align: left; table-layout: fixed; }
+        .leaderboard-table th, .leaderboard-table td { padding: 20px 24px; border-bottom: 1px solid var(--border-light); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .leaderboard-table th { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 900; background: #F8FAFC; }
+        .leaderboard-table th:nth-child(1), .leaderboard-table td:nth-child(1) { width: 15%; text-align: center; }
+        .leaderboard-table th:nth-child(2), .leaderboard-table td:nth-child(2) { width: 55%; }
+        .leaderboard-table th:nth-child(3), .leaderboard-table td:nth-child(3) { width: 30%; text-align: right; }
         .leaderboard-table tr:last-child td { border-bottom: none; }
         .leaderboard-table tr:hover td { background: #F8FAFC; }
         
@@ -227,6 +230,14 @@
         .spy-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
         .spy-card { background: #FFFFFF; color: var(--text-main); border-radius: 12px; padding: 12px 16px; border: 1px solid var(--border-light); }
         .spy-user-badge { font-weight: 800; color: var(--accent-blue); font-size: 0.9rem; margin-bottom: 4px; display: block; }
+
+        /* Edits for Leaderboard responsiveness on mobile screens */
+        @media (max-width: 680px) {
+            .leaderboard-table th, .leaderboard-table td { padding: 14px 10px; font-size: 0.85rem; }
+            .leaderboard-table th:nth-child(1), .leaderboard-table td:nth-child(1) { width: 20%; }
+            .leaderboard-table th:nth-child(2), .leaderboard-table td:nth-child(2) { width: 50%; }
+            .leaderboard-table th:nth-child(3), .leaderboard-table td:nth-child(3) { width: 30%; }
+        }
     </style>
 </head>
 <body>
@@ -283,64 +294,48 @@
         let internalDrawWinners = {}; 
         let unlockedPredictions = {}; 
 
-        // Fully Synchronized Tournament Schedule Matrix in Bangkok Time (BKK, UTC+7)
         const SCHEDULE_MATRIX = {
-            // --- ROUND OF 16 ---
-            1:  { dateStr: "Sun, July 5",    timeStr: "04:00 AM", iso: "2026-07-05T04:00:00+07:00" }, //Paraguay - France
-            2:  { dateStr: "Sun, July 5",    timeStr: "00:00 AM", iso: "2026-07-05T00:00:00+07:00" }, //Canada - Morrocco
-            3:  { dateStr: "Mon, July 7",    timeStr: "02:00 AM", iso: "2026-07-07T02:00:00+07:00" }, //Portugal - Spain
-            4:  { dateStr: "Mon, July 7",    timeStr: "07:00 AM", iso: "2026-07-07T07:00:00+07:00" }, //United States- Belgium
-            5:  { dateStr: "Tue, July 6",    timeStr: "03:00 AM", iso: "2026-07-06T03:00:00+07:00" }, //Brazil - Norway
-            6:  { dateStr: "Tue, July 6",    timeStr: "08:00 AM", iso: "2026-07-06T08:00:00+07:00" }, //Mexico - England
-            7:  { dateStr: "Tue, July 7",    timeStr: "11:00 PM", iso: "2026-07-07T23:00:00+07:00" }, //Argentina - Egypt
-            8:  { dateStr: "Wed, July 8",    timeStr: "03:00 AM", iso: "2026-07-08T03:00:00+07:00" }, //Switzerland - Columbia
+            1:  { dateStr: "Sun, July 5",    timeStr: "04:00 AM", iso: "2026-07-05T04:00:00+07:00" }, 
+            2:  { dateStr: "Sun, July 5",    timeStr: "00:00 AM", iso: "2026-07-05T00:00:00+07:00" }, 
+            3:  { dateStr: "Mon, July 7",    timeStr: "02:00 AM", iso: "2026-07-07T02:00:00+07:00" }, 
+            4:  { dateStr: "Mon, July 7",    timeStr: "07:00 AM", iso: "2026-07-07T07:00:00+07:00" }, 
+            5:  { dateStr: "Tue, July 6",    timeStr: "03:00 AM", iso: "2026-07-06T03:00:00+07:00" }, 
+            6:  { dateStr: "Tue, July 6",    timeStr: "08:00 AM", iso: "2026-07-06T08:00:00+07:00" }, 
+            7:  { dateStr: "Tue, July 7",    timeStr: "11:00 PM", iso: "2026-07-07T23:00:00+07:00" }, 
+            8:  { dateStr: "Wed, July 8",    timeStr: "03:00 AM", iso: "2026-07-08T03:00:00+07:00" }, 
 
-            // --- QUARTER FINALS ---
-            9:  { dateStr: "Fri, July 10",   timeStr: "03:00 AM", iso: "2026-07-10T03:00:00+07:00" }, // France - Morrocco
-            10: { dateStr: "Sat, July 12",   timeStr: "04:00 AM", iso: "2026-07-12T04:00:00+07:00" }, // Brazil or Norway vs Mexico - England
-            11: { dateStr: "Sun, July 11",   timeStr: "02:00 AM", iso: "2026-07-11T02:00:00+07:00" }, // Portugal or Spain vs United States- Belgium
-            12: { dateStr: "Sun, July 12",   timeStr: "08:00 AM", iso: "2026-07-12T08:00:00+07:00" }, // Argentina or Egypt vs Switzerland - Columbia 
+            9:  { dateStr: "Fri, July 10",   timeStr: "03:00 AM", iso: "2026-07-10T03:00:00+07:00" }, 
+            10: { dateStr: "Sat, July 12",   timeStr: "04:00 AM", iso: "2026-07-12T04:00:00+07:00" }, 
+            11: { dateStr: "Sun, July 11",   timeStr: "02:00 AM", iso: "2026-07-11T02:00:00+07:00" }, 
+            12: { dateStr: "Sun, July 12",   timeStr: "08:00 AM", iso: "2026-07-12T08:00:00+07:00" }, 
 
-            // --- SEMI FINALS ---
-            13: { dateStr: "Wed, July 15",   timeStr: "02:00 AM", iso: "2026-07-15T02:00:00+07:00" }, //France / Morrocco vs Portugal / Spain / United States / Belgium
-            14: { dateStr: "Thu, July 16",   timeStr: "02:00 AM", iso: "2026-07-16T02:00:00+07:00" }, //Brazil / Norway / Mexico / England vs Argentina / Egypt / Switzerland / Columbia 
+            13: { dateStr: "Wed, July 15",   timeStr: "02:00 AM", iso: "2026-07-15T02:00:00+07:00" }, 
+            14: { dateStr: "Thu, July 16",   timeStr: "02:00 AM", iso: "2026-07-16T02:00:00+07:00" }, 
 
-            // --- FINALS WEEKEND ---
-            16: { dateStr: "Sun, July 19",   timeStr: "04:00 AM", iso: "2026-07-19T04:00:00+07:00" }, // 3rd Place
-            15: { dateStr: "Mon, July 20",   timeStr: "02:00 AM", iso: "2026-07-20T02:00:00+07:00" }  // Final
+            16: { dateStr: "Sun, July 19",   timeStr: "04:00 AM", iso: "2026-07-19T04:00:00+07:00" }, 
+            15: { dateStr: "Mon, July 20",   timeStr: "02:00 AM", iso: "2026-07-20T02:00:00+07:00" }  
         };
 
-        // CORRECTED CASCADE LOGIC MAP - 100% Synced with official FIFA Bracket Layout
         const CASCADE_MAP = {
-            // Left Bracket - Top Stream (France/Morocco branch)
             1: { nextMatchId: 9,  slot: 'home' }, 
             2: { nextMatchId: 9,  slot: 'away' },
-
-            // Left Bracket - Bottom Stream (Portugal/Spain/USA/Belgium branch) -> Goes to QF 2
             5: { nextMatchId: 10, slot: 'home' }, 
             6: { nextMatchId: 10, slot: 'away' },
-
-            // Right Bracket - Top Stream (Brazil/Norway/Mexico/England branch) -> Goes to QF 3
             3: { nextMatchId: 11, slot: 'home' }, 
             4: { nextMatchId: 11, slot: 'away' },
-
-            // Right Bracket - Bottom Stream (Argentina/Egypt/Switzerland/Colombia branch) -> Goes to QF 4
             7: { nextMatchId: 12, slot: 'home' }, 
             8: { nextMatchId: 12, slot: 'away' },
 
-            // Semi-Final Progression
-            9:  { nextMatchId: 13, slot: 'home' }, // Winner QF1
-            10: { nextMatchId: 14, slot: 'home' }, // Winner QF2
-            11: { nextMatchId: 13, slot: 'away' }, // Winner QF3
-            12: { nextMatchId: 14, slot: 'away' }, // Winner QF4
+            9:  { nextMatchId: 13, slot: 'home' }, 
+            10: { nextMatchId: 14, slot: 'home' }, 
+            11: { nextMatchId: 13, slot: 'away' }, 
+            12: { nextMatchId: 14, slot: 'away' },
 
-            // Grand Final Progression
-            13: { nextMatchId: 15, slot: 'home' }, // Winner SF1
-            14: { nextMatchId: 15, slot: 'away' }, // Winner SF2
+            13: { nextMatchId: 15, slot: 'home' }, 
+            14: { nextMatchId: 15, slot: 'away' }, 
             
-            // 3rd Place Play-off Progression (Loser Logic)
-            13: { nextMatchId: 16, slot: 'home', type: 'loser' }, // Loser SF1
-            14: { nextMatchId: 16, slot: 'away', type: 'loser' }  // Loser SF2
+            13: { nextMatchId: 16, slot: 'home', type: 'loser' }, 
+            14: { nextMatchId: 16, slot: 'away', type: 'loser' }  
         };
 
         function showTab(id, el) {
@@ -508,7 +503,6 @@
             const f = allMatches.filter(m => m.id === 15);
             const tp = allMatches.filter(m => m.id === 16);
 
-            // Reverted back: Final sits static above 3rd place for all device screen rendering paths
             document.getElementById('bracket-canvas').innerHTML = `
                 <div class="bracket-column"><div class="column-header">Round of 16</div>${r16.map(cleanMatchBlock).join('')}</div>
                 <div class="bracket-column"><div class="column-header">Quarter Finals</div>${qf.map(cleanMatchBlock).join('')}</div>
@@ -553,7 +547,6 @@
                 `;
             }).join('');
 
-            // UX Optimization: Reordered prediction listings specifically to show 3rd Place before Grand Final
             const nonFinalsPredictionList = allMatches.filter(m => m.id !== 15 && m.id !== 16);
             const finalsPredictionList = [...tp, ...f]; 
             const fullyOrderedPredictionGrid = [...nonFinalsPredictionList, ...finalsPredictionList];
@@ -754,19 +747,47 @@
             const { data: preds } = await db.from('predictions').select('*');
             globalPredictionsCache = preds || [];
             
-            let standings = {};
+            let playerBreakdown = {};
             
             globalPredictionsCache.forEach(p => {
-                if (!standings[p.player_name]) standings[p.player_name] = 0;
+                if (!playerBreakdown[p.player_name]) {
+                    playerBreakdown[p.player_name] = {
+                        name: p.player_name,
+                        points: 0,
+                        exactCount: 0,
+                        finalPts: 0,
+                        thirdPlacePts: 0,
+                        sfPts: 0,
+                        qfPts: 0,
+                        r16Pts: 0
+                    };
+                }
                 
                 const match = allMatches.find(m => m.id === p.match_id);
                 const pointsAwarded = calculateMatchPoints(match, p);
+                
                 if (pointsAwarded !== null) {
-                    standings[p.player_name] += pointsAwarded;
+                    const tracker = playerBreakdown[p.player_name];
+                    tracker.points += pointsAwarded;
+                    if (pointsAwarded === 3) tracker.exactCount++;
+                    
+                    if (match.id === 15) tracker.finalPts += pointsAwarded;
+                    else if (match.id === 16) tracker.thirdPlacePts += pointsAwarded;
+                    else if (match.id >= 13 && match.id <= 14) tracker.sfPts += pointsAwarded;
+                    else if (match.id >= 9 && match.id <= 12) tracker.qfPts += pointsAwarded;
+                    else if (match.id >= 1 && match.id <= 8) tracker.r16Pts += pointsAwarded;
                 }
             });
 
-            const sorted = Object.keys(standings).map(name => ({ name, points: standings[name] })).sort((a,b) => b.points - a.points);
+            const sorted = Object.values(playerBreakdown).sort((a, b) => {
+                if (b.points !== a.points) return b.points - a.points;
+                if (b.exactCount !== a.exactCount) return b.exactCount - a.exactCount;
+                if (b.finalPts !== a.finalPts) return b.finalPts - a.finalPts;
+                if (b.thirdPlacePts !== a.thirdPlacePts) return b.thirdPlacePts - a.thirdPlacePts;
+                if (b.sfPts !== a.sfPts) return b.sfPts - a.sfPts;
+                if (b.qfPts !== a.qfPts) return b.qfPts - a.qfPts;
+                return b.r16Pts - a.r16Pts;
+            });
             
             let tableRows = '<tr><td colspan="3" style="text-align:center; color:var(--text-muted); padding:30px;">No predictions registered.</td></tr>';
             if (sorted.length) {
@@ -812,18 +833,15 @@
             if(!matchId) return;
 
             const targetMatch = allMatches.find(m => m.id === matchId);
-            const targetSched = SCHEDULE_MATRIX[matchId];
             const displayArea = document.getElementById('spy-results-area');
 
-            if(!targetMatch || !targetSched) return;
+            if(!targetMatch) return;
 
-            const now = new Date().getTime();
-            const kickOffTime = new Date(targetSched.iso).getTime();
-
-            if (now < kickOffTime) {
+            // Strict Lockdown check: Check if home_score has been entered by the admin panel
+            if (targetMatch.home_score === null) {
                 displayArea.innerHTML = `
                     <div style="grid-column: 1 / -1; background:rgba(255,255,255,0.05); text-align:center; padding:2rem; border-radius:12px; color:#94A3B8; font-weight:700;">
-                        🔒 Selections remain hidden until kickoff on <strong>${targetSched.dateStr} at ${targetSched.timeStr}</strong> to prevent copying.
+                        🔒 Selections are hidden until the Admin locks down and submits the official match outcome.
                     </div>
                 `;
                 return;
@@ -845,7 +863,7 @@
                         <div style="font-size:0.95rem; font-weight:700; margin:6px 0;">
                             Prediction: ${p.pred_home} - ${p.pred_away} ${isWinnerChosen}
                         </div>
-                        <span style="font-size:0.75rem; font-weight:800; color:${ptsEarned > 0 ? 'var(--winner-text)' : '#64748B'}">
+                        <span style="font-size:0.75rem; font-weight:800; color:${ptsEarned > 0 ? '#065F46' : '#64748B'}">
                             ${ptsEarned !== null ? `Result: +${ptsEarned} PTS Awarded` : 'Match Live (Awaiting Final Score)'}
                         </span>
                     </div>
