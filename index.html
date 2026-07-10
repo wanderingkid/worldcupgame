@@ -325,17 +325,17 @@
             4: { nextMatchId: 11, slot: 'away' },
             7: { nextMatchId: 12, slot: 'home' }, 
             8: { nextMatchId: 12, slot: 'away' },
-        
+
             9:  { nextMatchId: 13, slot: 'home' }, 
-            11: { nextMatchId: 13, slot: 'away' }, // Match 11 winner goes to Match 13 away slot
-            10: { nextMatchId: 14, slot: 'home' }, // Match 10 winner goes to Match 14 home slot
-            12: { nextMatchId: 14, slot: 'away' }, // Match 12 winner goes to Match 14 away slot
-        
+            10: { nextMatchId: 14, slot: 'home' }, 
+            11: { nextMatchId: 13, slot: 'away' }, 
+            12: { nextMatchId: 14, slot: 'away' },
+
             13: { nextMatchId: 15, slot: 'home' }, 
             14: { nextMatchId: 15, slot: 'away' }, 
             
-            // Using an array or distinct keys if you need to pass losers to match 16
-            // Note: your original object overwrote the '13' and '14' keys here!
+            13: { nextMatchId: 16, slot: 'home', type: 'loser' }, 
+            14: { nextMatchId: 16, slot: 'away', type: 'loser' }  
         };
 
         function showTab(id, el) {
@@ -780,7 +780,7 @@
             });
 
             const sorted = Object.values(playerBreakdown).sort((a, b) => {
-                if (b.points !== a.points) return b.points - a.points;
+                if (b.points !== a.points; return b.points - a.points;
                 if (b.exactCount !== a.exactCount) return b.exactCount - a.exactCount;
                 if (b.finalPts !== a.finalPts) return b.finalPts - a.finalPts;
                 if (b.thirdPlacePts !== a.thirdPlacePts) return b.thirdPlacePts - a.thirdPlacePts;
